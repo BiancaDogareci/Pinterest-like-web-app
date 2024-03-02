@@ -1,0 +1,20 @@
+﻿
+
+@model Pinterest.Models.Category
+
+<h2>Add your categories!</h2>
+
+
+<form action="/Categories/New" method="post" enctype="multipart/form-data">
+    @Html.Label("Name", "Name:")
+    <br />
+    @Html.TextBox("Name", null, new { @class = "form-control" })
+    @Html.ValidationMessage("Name", null, new { @class = "text-danger" })
+    <br />
+
+    <br />
+
+    <input class="btn btn-outline-success" type="submit" value="Upload" />
+</form>
+
+

@@ -1,0 +1,50 @@
+﻿<h1>@ViewBag.Category?.Name</h1>
+
+
+<form method="post" action="/Categories/Delete_Category">
+    <input type="hidden" name="categoryId" value="@ViewBag.Category?.Id" />
+
+    <button type="submit" class="btn btn-outline-success"> Delete category </button>
+</form>
+
+<hr />
+
+@if (ViewBag.Pins.Count == 0)
+{
+    <p> No pins saved in this category.</p>
+}
+
+@foreach (var pin in ViewBag.Pins)
+{
+    <h2>@pin.Title</h2>
+
+    @if (@pin.EmbeddedContentPath.EndsWith(".jpg") || pin.EmbeddedContentPath.EndsWith(".jpeg") || @pin.EmbeddedContentPath.EndsWith(".png") || @pin.EmbeddedContentPath.EndsWith(".gif"))
+    {
+        <img src="@pin.EmbeddedContentPath" alt="Imagine încorporată" style="max-height: 450px; max-width: 360px; width: auto; height: auto;" />
+    }
+    else if (@pin.EmbeddedContentPath.EndsWith(".mp4") || @pin.EmbeddedContentPath.EndsWith(".avi") || @pin.EmbeddedContentPath.EndsWith(".mov"))
+    {
+        <video width="400" controls>
+            <source src="@pin.EmbeddedContentPath" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    }
+
+    <p>@pin.Description</p>
+
+    <br />
+
+    <form method="post" action="/Categories/Delete">
+        <input type="hidden" name="categoryId" value="@ViewBag.Category?.Id" />
+        <input type="hidden" name="pinId" value="@pin.Id" />
+
+        <button type="submit" class="btn btn-outline-success"> Delete this pin from the category </button>
+    </form>
+
+    <hr />
+}
+
+
+<br />
+
+<a href="/Categories/Index"> Back to your categories! </a>

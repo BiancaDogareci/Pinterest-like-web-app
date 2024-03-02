@@ -1,0 +1,18 @@
+﻿
+@model Pinterest.Models.Comment
+
+<br />
+<h2>Edit comment</h2>
+<br />
+
+<form method="post" action="/Comments/Edit/@Model.Id">
+
+    <label> Text </label>
+    <br />
+    <input type="text" name="Text" value="@Model.Text" />
+    <br />
+    @Html.ValidationMessage("Text", null, new { @class = "text-danger" })
+    <br /><br />
+
+    <button type="submit" class="btn btn-outline-success">Post</button>
+</form>

@@ -1,0 +1,30 @@
+﻿@{
+    ViewBag.PageName = "Your Profile";
+
+    //pentru a lua prima parte a mail-ului
+    string email = ViewBag.user.Email;
+    string firstPart = email.Substring(0, email.IndexOf('@'));
+}
+
+<h2>@ViewBag.PageName</h2>
+<h4>@firstPart</h4>
+
+<hr/>
+
+<h5>Your Categories:</h5>
+
+<hr/>
+
+@foreach (var category in ViewBag.Categories)
+{
+    <p style="font-weight: bold;">@category.Name</p>
+    <a href="/Categories/Show/@category.Id"> View pins from category </a>
+
+    <br />
+    <hr />
+    <br />
+}
+
+<form method="get" action="/Categories/New">
+    <button class="btn btn-outline-success" type="submit"> Add a new category </button>
+</form>

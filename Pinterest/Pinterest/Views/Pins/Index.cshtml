@@ -1,0 +1,93 @@
+﻿@{
+    ViewBag.PageName = "For You";
+}
+
+
+<h2>@ViewBag.PageName</h2>
+
+<form method="GET">
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Search topics or keywords" name="search" value="@ViewBag.SearchString">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+    </div>
+</form>
+
+
+<form method="get" action="/Pins/IndexRecent">
+    <button type="submit" class="btn btn-outline-success"> Sort by most recent </button>
+</form>
+
+<hr />
+
+@foreach (var item in ViewBag.Pins)
+{
+    
+    <h1>@item.Title</h1>
+
+    @if (item.EmbeddedContentPath.EndsWith(".jpg") || item.EmbeddedContentPath.EndsWith(".jpeg") || item.EmbeddedContentPath.EndsWith(".png") || item.EmbeddedContentPath.EndsWith(".gif"))
+    {
+        <img src="@item.EmbeddedContentPath" alt="Imagine încorporată" style="max-height: 450px; max-width: 360px; width: auto; height: auto;" />
+    }
+    else if (item.EmbeddedContentPath.EndsWith(".mp4") || item.EmbeddedContentPath.EndsWith(".avi") || item.EmbeddedContentPath.EndsWith(".mov"))
+    {
+        <video width="500" controls>
+            <source src="@item.EmbeddedContentPath" type="video/mp4">
+        </video>
+    }
+
+    <p>@item.Description</p>
+    <small>@item.Date</small>
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <a href="/Pins/Show/@item.Id"> View pin </a>
+    }
+    else
+    {
+        <a href="/Pins/GeneralShow/@item.Id"> View pin </a>
+    }
+
+    <br />
+    <hr />
+}
+
+
+<div>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item">
+                <a class="page-link"
+                   href="@ViewBag.PaginationBaseUrl=1" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            @for (int i = 1; i <= ViewBag.lastPage; i++)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       href="@ViewBag.PaginationBaseUrl=@i">@(i)</a>
+                </li>
+            }
+            <li class="page-item">
+                <a class="page-link"
+                   href="@ViewBag.PaginationBaseUrl=@(ViewBag.lastPage)" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+
+@if (User.Identity.IsAuthenticated)
+{
+    <form method="get" action="/Pins/New">
+        <button type="submit" class="btn btn-outline-success"> Add a new pin </button>
+    </form>
+
+    <br />
+}
+else
+{
+    <p>Login to add a new pin</p>
+}

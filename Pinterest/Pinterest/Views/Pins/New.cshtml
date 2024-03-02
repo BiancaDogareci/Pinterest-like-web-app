@@ -1,0 +1,28 @@
+﻿
+@model Pinterest.Models.Pin
+
+<h2>Add your pin!</h2>
+
+<form action="/Pins/New" method="post" enctype="multipart/form-data">
+    @Html.Label("Title", "Title:")
+    <br />
+    @Html.TextBox("Title", null, new { @class = "form-control"})
+    @Html.ValidationMessage("Title", null, new { @class = "text-danger" })
+    <br /><br />
+
+    @Html.Label("Description", "Description:")
+    <br />
+    @Html.TextArea("Description", null, new { @class = "form-control" })
+    @Html.ValidationMessage("Description", null, new { @class = "text-danger" })
+    <br /><br />
+    
+    @Html.Label(null, "Content:")
+    <br />
+    <input name="Path" class="form-control" type="file" />
+    @Html.ValidationMessage("EmbeddedContentPath", null, new { @class = "text-danger" })
+    <br /><br />
+    
+    <button type="submit" class="btn btn-outline-success">Post pin</button>
+</form>
+
+

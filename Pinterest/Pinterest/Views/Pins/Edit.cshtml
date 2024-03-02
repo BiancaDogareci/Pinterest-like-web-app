@@ -1,0 +1,27 @@
+﻿
+@model Pinterest.Models.Pin
+
+<br />
+<h2>Edit pin</h2>
+<br />
+
+<form method="post" action="/Pins/Edit/@Model.Id">
+
+    <label> Title </label>
+    <br />
+    <input type="text" name="Title" value="@Model.Title" />
+    <br />
+    @Html.ValidationMessage("Title", null, new { @class = "text-danger" })
+    <br /><br />
+
+    <label> Description </label>
+    <br />
+    <input type="text" name="Description" value="@Model.Description" />
+    <br />
+    @Html.ValidationMessage("Description", null, new { @class = "text-danger" })
+    <br /><br />
+
+    <br /><br />
+
+    <button type="submit" class="btn btn-outline-success"> Post</button>
+</form>

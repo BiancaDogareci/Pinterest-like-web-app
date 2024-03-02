@@ -1,0 +1,309 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\obj\\Debug\\net6.0\\scopedcss\\projectbundle\\Pinterest.bundle.scp.css",
+      "PackagePath": "staticwebassets\\Pinterest.bundle.scp.css"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\css\\site.css",
+      "PackagePath": "staticwebassets\\css\\site.css"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\favicon.ico",
+      "PackagePath": "staticwebassets\\favicon.ico"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\images\\284ca8eb71d23d8bf6c5fb3dc63f318f[1].jpg",
+      "PackagePath": "staticwebassets\\images\\284ca8eb71d23d8bf6c5fb3dc63f318f[1].jpg"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\images\\519d85e4e50d1cbc8d5010ab4c9aeda4[1].jpg",
+      "PackagePath": "staticwebassets\\images\\519d85e4e50d1cbc8d5010ab4c9aeda4[1].jpg"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\images\\7b71f6a4dd95cba99292c1cb85ea690f[1].jpg",
+      "PackagePath": "staticwebassets\\images\\7b71f6a4dd95cba99292c1cb85ea690f[1].jpg"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\images\\Everlasting summer 2.gif",
+      "PackagePath": "staticwebassets\\images\\Everlasting summer 2.gif"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\images\\Everlasting summer 7.gif",
+      "PackagePath": "staticwebassets\\images\\Everlasting summer 7.gif"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\images\\a5a926535bf0dc736e4d8ab2edce02bc[1].jpg",
+      "PackagePath": "staticwebassets\\images\\a5a926535bf0dc736e4d8ab2edce02bc[1].jpg"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\images\\b49a9e74ba2ef314dcc53e5bb85f83e9[1].jpg",
+      "PackagePath": "staticwebassets\\images\\b49a9e74ba2ef314dcc53e5bb85f83e9[1].jpg"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\images\\c40a45d648bf228638efcc8865d59f26[1].jpg",
+      "PackagePath": "staticwebassets\\images\\c40a45d648bf228638efcc8865d59f26[1].jpg"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\images\\ce40c0ca0a2252c3881a280b2b02fd02[1].jpg",
+      "PackagePath": "staticwebassets\\images\\ce40c0ca0a2252c3881a280b2b02fd02[1].jpg"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\images\\dd4a483ea651c3990e68da63148b87e2[1].jpg",
+      "PackagePath": "staticwebassets\\images\\dd4a483ea651c3990e68da63148b87e2[1].jpg"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\js\\site.js",
+      "PackagePath": "staticwebassets\\js\\site.js"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\LICENSE",
+      "PackagePath": "staticwebassets\\lib\\bootstrap"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.css.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap-utilities.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.css"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.css.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.css.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\css\\bootstrap.rtl.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.js.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.bundle.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.js.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.esm.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.js"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.js.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.min.js",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.min.js"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\bootstrap\\dist\\js\\bootstrap.min.js.map",
+      "PackagePath": "staticwebassets\\lib\\bootstrap\\dist\\js\\bootstrap.min.js.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\jquery-validation-unobtrusive\\LICENSE.txt",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\LICENSE.txt"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.js"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.min.js"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\jquery-validation\\LICENSE.md",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\LICENSE.md"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\jquery-validation\\dist\\additional-methods.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\additional-methods.js"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\jquery-validation\\dist\\additional-methods.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\additional-methods.min.js"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\jquery-validation\\dist\\jquery.validate.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\jquery.validate.js"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\jquery-validation\\dist\\jquery.validate.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation\\dist\\jquery.validate.min.js"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\jquery\\LICENSE.txt",
+      "PackagePath": "staticwebassets\\lib\\jquery\\LICENSE.txt"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\jquery\\dist\\jquery.js",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.js"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\jquery\\dist\\jquery.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.js"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\lib\\jquery\\dist\\jquery.min.map",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.map"
+    },
+    {
+      "Id": "C:\\Users\\bianc\\Desktop\\DePusPeGitHub\\Pinterest\\Pinterest\\wwwroot\\videos\\Chris De Burgh - Lady In Red (Official Video).mp4",
+      "PackagePath": "staticwebassets\\videos\\Chris De Burgh - Lady In Red (Official Video).mp4"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.Pinterest.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.build.Pinterest.props",
+      "PackagePath": "build\\Pinterest.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.buildMultiTargeting.Pinterest.props",
+      "PackagePath": "buildMultiTargeting\\Pinterest.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.buildTransitive.Pinterest.props",
+      "PackagePath": "buildTransitive\\Pinterest.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

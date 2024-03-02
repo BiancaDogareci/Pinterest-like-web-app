@@ -1,0 +1,78 @@
+html {
+    font-size: 14px;
+    background-color: rgb(255,242,235);
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+        background-color: rgb(255,242,235);
+    }
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+    background-color: rgb(255,242,235);
+}
+
+body {
+    margin-bottom: 60px;
+    background-color: rgb(255,242,235);
+}
+
+.btn-outline-success {
+    color: darkred;
+    border-color: darkred;
+    font-weight: bold;
+}
+
+.btn-outline-success:hover {
+    background-color: darkred;
+    border-color: darkred;
+    color: white;
+    font-weight: bold;
+}
+
+.pagination .page-link {
+    background-color: #dc3545;
+    border-color: white;
+    color: white;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.pagination .page-link:hover {
+    background-color: darkred;
+    border-color: darkred;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: darkred;
+    border-color: darkred;
+}
+
+a {
+    color: rgb(68, 0, 0);
+    text-decoration: none;
+    transition: color 0.3s;
+    font-weight: bold;
+}
+
+a:hover {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: darkred;
+    border-color: darkred;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: rgb(255,242,235);
+    color: darkred;
+    border-color: darkred;
+}
+

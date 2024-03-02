@@ -1,0 +1,124 @@
+﻿
+
+<hr />
+
+<h1>@ViewBag.Pin.Title</h1>
+
+@if (ViewBag.Pin.EmbeddedContentPath.EndsWith(".jpg") || ViewBag.Pin.EmbeddedContentPath.EndsWith(".jpeg") || ViewBag.Pin.EmbeddedContentPath.EndsWith(".png") || ViewBag.Pin.EmbeddedContentPath.EndsWith(".gif"))
+{
+    <img src="@ViewBag.Pin.EmbeddedContentPath" alt="Imagine încorporată" style="max-height: 450px; max-width: 360px; width: auto; height: auto;" />
+}
+else if (ViewBag.Pin.EmbeddedContentPath.EndsWith(".mp4") || ViewBag.Pin.EmbeddedContentPath.EndsWith(".avi") || ViewBag.Pin.EmbeddedContentPath.EndsWith(".mov"))
+{
+    <video width="400" controls>
+        <source src="@ViewBag.Pin.EmbeddedContentPath" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+}
+
+<p>@ViewBag.Pin.Description</p>
+
+<!-- Adaugare icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+@if (ViewBag.Liked == true)
+{
+    <form method="post" action="/Pins/Like/@ViewBag.Pin.Id">
+        @Html.AntiForgeryToken()
+        <button type="submit" id="likeButton" style="color: darkgreen;">
+            <i class="fa fa-thumbs-up"> </i> Like
+        </button>
+    </form>
+}
+else
+{
+    <form method="post" action="/Pins/Like/@ViewBag.Pin.Id">
+        @Html.AntiForgeryToken()
+        <button type="submit" id="likeButton" style="color: black;">
+            <i class="fa fa-thumbs-up"> </i> Like
+        </button>
+    </form>
+}
+
+<p>Likes: @ViewBag.Pin.LikesCount</p>
+
+<small>@ViewBag.Pin.Date</small>
+
+<br />
+
+<div style="display: flex; gap: 12px;">
+    <form method="get" action="/Comments/New">
+        <input type="hidden" name="pinId" value="@ViewBag.Pin.Id" />
+        <button type="submit" class="btn btn-outline-success">Add comment</button>
+    </form>
+
+    <form method="post" action="/Pins/Delete/@ViewBag.Pin.Id">
+        <button type="submit" class="btn btn-outline-success">Delete pin</button>
+    </form>
+
+    <form method="get" action="/Pins/Edit/@ViewBag.Pin.Id">
+        <button type="submit" class="btn btn-outline-success">Edit pin</button>
+    </form>
+</div>
+
+<br />
+
+<form method="post" action="/Categories/SavePin" style="display: inline" enctype="application/x-www-form-urlencoded">
+    <button type="submit" class="btn btn-outline-success"
+    @{
+        if (ViewBag.Categories.Count == 0)
+        {
+            @:disabled="disabled"
+            @:style="color: 	#b44e4e;"
+        }
+    }>
+        Save pin
+    </button>
+    <input type="hidden" name="pinId" value="@ViewBag.Pin.Id"/>
+    <select name="categoryId" style="background-color: #940f0f; color: white;" class="btn btn-outline-success">
+        @foreach (var category in ViewBag.Categories ?? Enumerable.Empty<Category>())
+        {
+            <option value="@category.Id"> @category.Name</option>
+        }
+    </select>
+</form>
+
+
+<hr />
+<br />
+
+<h3>Comments:</h3>
+
+@foreach (var comment in ViewBag.Comments)
+{
+    //pentru a lua prima parte a mail-ului
+    string email = @comment.AppUser.Email;
+    string firstPart = email.Substring(0, email.IndexOf('@'));
+
+    <p> User: @firstPart </p>
+    <p> @comment.Text </p>
+    <p>Date: @comment.Date </p>
+
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div style="display: flex; gap: 10px;">
+            <form method="post" action="/Comments/Delete/@comment.Id">
+                <button type="submit" class="btn btn-outline-success"> Delete comment </button>
+            </form>
+
+            <br />
+
+            <form method="get" action="/Comments/Edit/@comment.Id">
+                <button type="submit" class="btn btn-outline-success"> Edit comment </button>
+            </form>
+        </div>
+
+        <br />
+    }
+    <hr />
+}
+
+<br />
+
+<a href="/Pins/Index"> Back to for you! </a>
