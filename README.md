@@ -4,13 +4,13 @@
 - The admin user can only delete posts or comments from any authenticated user.
 
 ### A demonstration provided for each type of user:
-**Guest user**
+### Guest user
 https://github.com/BiancaDogareci/Social_Bookmarking_Web_Application/assets/119197457/6cc14787-a29f-4b20-a0c3-d22f2622c8c8
 
-**Authenticated user**
+### Authenticated user
 https://github.com/BiancaDogareci/Social_Bookmarking_Web_Application/assets/119197457/bdb513b8-0673-4d5d-8705-c6712c2f565d
 
-**Admin user**
+#### Admin user
 https://github.com/BiancaDogareci/Social_Bookmarking_Web_Application/assets/119197457/abe527ed-4ee7-4cf6-994b-708b4644c30f
 
 
