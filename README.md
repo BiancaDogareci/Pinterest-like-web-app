@@ -1,6 +1,9 @@
-### A Pinterest-inspired app developed in ASP.NET/C#, using MVC architecture and a SQL Server database. It lets the user share photos, videos, GIFs, and comments, as well as like and save posts to personalized collections/boards on their profile. 
+### A Pinterest-inspired app developed in ASP.NET/C#, using MVC architecture and a SQL Server database.
+### It lets the authenticated user share photos, videos, GIFs, and comments, as well as like and save posts to personalized collections/boards on their profile. They can also edit or delete their previous posts, comments or collections/boards. 
+### A guest user can see posts and comments from authenticated users, but they can't post, comment, like or have their own collections/boards. 
+### The admin user can only delete posts or comments from any authenticated user.
 
-## Types of users and their corresponding actions within the application, with a demonstration provided for each:
+### A demonstration provided for each type of user:
 ### Guest user:
 https://github.com/BiancaDogareci/Social_Bookmarking_Web_Application/assets/119197457/6cc14787-a29f-4b20-a0c3-d22f2622c8c8
 
