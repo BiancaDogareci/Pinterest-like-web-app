@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Pinterest.Services;
+using Pinterest.Repositories;
 
 namespace Pinterest.Controllers
 {
@@ -18,6 +20,7 @@ namespace Pinterest.Controllers
         private readonly UserManager<AppUser> _userManager;
 
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly PinService _pinService;
 
         public PinsController(ApplicationDbContext context, IWebHostEnvironment env, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
         {
@@ -25,80 +28,31 @@ namespace Pinterest.Controllers
             _env = env;
             _userManager = userManager;
             _roleManager = roleManager;
+
+            var repo = new PinRepository(context);
+            _pinService = new PinService(repo);
+
         }
 
         [HttpGet]
         public IActionResult Index()
         {
             int _perPage = 3;
+            int currentPage = Convert.ToInt32(HttpContext.Request.Query["page"]);
+            string search = Convert.ToString(HttpContext.Request.Query["search"])?.Trim() ?? "";
 
-            var pins = from pin in db.Pins
-                       orderby pin.LikesCount descending
-                       select pin;
+            var (pins, lastPage, paginationUrl) = _pinService.GetPins(search, currentPage == 0 ? 1 : currentPage, _perPage);
 
-            var search = "";
-
-            // MOTOR DE CAUTARE
-            if (Convert.ToString(HttpContext.Request.Query["search"]) != null)
-            {
-                // Eliminam spatiile libere
-                search = Convert.ToString(HttpContext.Request.Query["search"]).Trim();
-                // Cautare in pin (Titlu si Descriere)
-                List<int> pinIds = db.Pins.Where
-                (
-                at => at.Title.Contains(search)
-                || at.Description.Contains(search)
-                ).Select(a => a.Id).ToList();
-
-                // Cautare in comentarii
-                List<int> pinIdsOfCommentsWithSearchString =
-                db.Comments.Where
-                (
-                c => c.Text.Contains(search)
-                ).Select(c => (int)c.PinId).ToList();
-
-                // Se formeaza o singura lista formata din toate id-urile selectate anterior
-                List<int> mergedIds = pinIds.Union(pinIdsOfCommentsWithSearchString).ToList();
-                
-                pins = db.Pins.Where(pin =>
-                mergedIds.Contains(pin.Id))
-                .Include("AppUser")
-                .OrderBy(a => a.Title);
-            }
-            ViewBag.SearchString = search;
-
-            // Afisare paginata
             if (TempData.ContainsKey("message"))
             {
                 ViewBag.message = TempData["message"].ToString();
                 ViewBag.Alert = TempData["messageType"];
             }
 
-            int totalItems = pins.Count();
-            var currentPage = Convert.ToInt32(HttpContext.Request.Query["page"]);
-            var offset = 0;
-
-            if (!currentPage.Equals(0))
-            {
-                offset = (currentPage - 1) * _perPage;
-            }
-
-            var paginatedPins = pins.Skip(offset).Take(_perPage);
-
-            ViewBag.lastPage = Math.Ceiling((float)totalItems / (float)_perPage);
-
-            ViewBag.Pins = paginatedPins;
-
-
-            // MOTOR DE CAUTARE (continuare)
-            if (search != "")
-            {
-                ViewBag.PaginationBaseUrl = "/Pins/Index/?search=" + search + "&page";
-            }
-            else
-            {
-                ViewBag.PaginationBaseUrl = "/Pins/Index/?page";
-            }
+            ViewBag.SearchString = search;
+            ViewBag.Pins = pins;
+            ViewBag.lastPage = lastPage;
+            ViewBag.PaginationBaseUrl = paginationUrl;
 
             return View();
         }
@@ -107,40 +61,10 @@ namespace Pinterest.Controllers
         public IActionResult IndexRecent()
         {
             int _perPage = 3;
+            int currentPage = Convert.ToInt32(HttpContext.Request.Query["page"]);
+            string search = Convert.ToString(HttpContext.Request.Query["search"])?.Trim() ?? "";
 
-            var pins = from pin in db.Pins
-                       orderby pin.Date descending
-                       select pin;
-
-            var search = "";
-            // MOTOR DE CAUTARE
-            if (Convert.ToString(HttpContext.Request.Query["search"]) != null)
-            {
-                // Eliminam spatiile libere
-                search = Convert.ToString(HttpContext.Request.Query["search"]).Trim();
-                // Cautare in pin (Titlu si Descriere)
-                List<int> pinIds = db.Pins.Where
-                (
-                at => at.Title.Contains(search)
-                || at.Description.Contains(search)
-                ).Select(a => a.Id).ToList();
-
-                // Cautare in comentarii
-                List<int> pinIdsOfCommentsWithSearchString =
-                db.Comments.Where
-                (
-                c => c.Text.Contains(search)
-                ).Select(c => (int)c.PinId).ToList();
-
-                // Se formeaza o singura lista formata din toate id-urile selectate anterior
-                List<int> mergedIds = pinIds.Union(pinIdsOfCommentsWithSearchString).ToList();
-                pins = db.Pins.Where(pin =>
-                mergedIds.Contains(pin.Id))
-                .Include("AppUser")
-                .OrderBy(a => a.Title);
-            }
-            ViewBag.SearchString = search;
-
+            var (pins, lastPage, paginationUrl) = _pinService.GetRecentPinsWithSearch(search, currentPage == 0 ? 1 : currentPage, _perPage);
 
             if (TempData.ContainsKey("message"))
             {
@@ -148,53 +72,19 @@ namespace Pinterest.Controllers
                 ViewBag.Alert = TempData["messageType"];
             }
 
-            int totalItems = pins.Count();
-
-            var currentPage = Convert.ToInt32(HttpContext.Request.Query["page"]);
-
-            var offset = 0;
-
-            if (!currentPage.Equals(0))
-            {
-                offset = (currentPage - 1) * _perPage;
-            }
-
-            var paginatedPins = pins.Skip(offset).Take(_perPage);
-
-            ViewBag.lastPage = Math.Ceiling((float)totalItems / (float)_perPage);
-
-            ViewBag.Pins = paginatedPins;
-
-            // MOTOR DE CAUTARE (continuare)
-            if (search != "")
-            {
-                ViewBag.PaginationBaseUrl = "/Pins/Index/?search=" + search + "&page";
-            }
-            else
-            {
-                ViewBag.PaginationBaseUrl = "/Pins/Index/?page";
-            }
+            ViewBag.SearchString = search;
+            ViewBag.Pins = pins;
+            ViewBag.lastPage = lastPage;
+            ViewBag.PaginationBaseUrl = paginationUrl;
 
             return View();
         }
 
         public IActionResult Show(int? id)
         {
-            var pin = db.Pins
-                .Include(p => p.Comments)
-                .ThenInclude(c => c.AppUser)
-                .FirstOrDefault(p => p.Id == id);
-
             var user = _userManager.GetUserAsync(User).Result;
 
-            var categories = from c in db.Categories
-                             where c.AppUserId == user.Id
-                             && !(from pc in db.PinCategories
-                                  where pc.PinId == id
-                                  select pc.CategoryId).Contains(c.Id)
-                             select c;
-
-            bool hasLiked = db.Likes.Any(like => like.PinId == id && like.AppUserId == user.Id);
+            var (pin, categories, hasLiked) = _pinService.GetPinDetails(id, user);
 
             if (pin == null)
             {
@@ -202,10 +92,9 @@ namespace Pinterest.Controllers
             }
 
             ViewBag.Liked = hasLiked;
-
             ViewBag.Pin = pin;
             ViewBag.Comments = pin.Comments;
-            ViewBag.Categories = categories.ToList();
+            ViewBag.Categories = categories;
 
             return View();
         }
@@ -213,10 +102,7 @@ namespace Pinterest.Controllers
         [HttpGet]
         public IActionResult GeneralShow(int? id)
         {
-            var pin = db.Pins
-                .Include(p => p.Comments)
-                .ThenInclude(c => c.AppUser)
-                .FirstOrDefault(p => p.Id == id);
+            var pin = _pinService.GetPinForGeneralView(id);
 
             if (pin == null)
             {
@@ -235,60 +121,19 @@ namespace Pinterest.Controllers
         {
             return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> New(Pin pin, IFormFile Path)
         {
-            AppUser currentUser = await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User);
 
-            // Verificam daca exista imaginea in request (daca a fost incarcata o imagine)
-            if (Path != null && Path.Length > 0)
-            {
-                string folder;
+            var (isValid, errorMessage) = await _pinService.CreatePinAsync(pin, Path, user, _env);
 
-                if (Path.ContentType.Contains("image"))
-                {
-                    folder = "images";
-                }
-                else if (Path.ContentType.Contains("video"))
-                {
-                    folder = "videos";
-                }
-                else
-                {
-                    return View(pin);
-                }
-
-                var databaseFileName = $"/{folder}/";
-
-                // File upload
-                var storagePath = System.IO.Path.Combine(_env.WebRootPath, folder, Path.FileName);
-                databaseFileName += Path.FileName;
-
-                
-                using (var fileStream = new FileStream(storagePath, FileMode.Create))
-                {
-                    await Path.CopyToAsync(fileStream);
-                }
-
-                pin.EmbeddedContentPath = databaseFileName;
-            }
-
-            pin.Date = DateTime.Now;
-            pin.LikesCount = 0;
-            pin.AppUserId = currentUser.Id;
-
-            // sterge erorile existente
-            ModelState.Clear();
-            // verifica iar
-            TryValidateModel(pin);
-
-            if (!ModelState.IsValid)
+            if (!isValid)
             {
                 return View(pin);
             }
 
-            db.Pins.Add(pin);
-            db.SaveChanges();
             return RedirectToAction("Show", new { id = pin.Id });
         }
 
@@ -296,10 +141,16 @@ namespace Pinterest.Controllers
         [HttpGet]
         public IActionResult Edit(int? id)
         {
-            Pin pin = db.Pins.Find(id);
+            string currentUserId = _userManager.GetUserId(User);
 
-            AppUser currentUser = db.AppUsers.Find(_userManager.GetUserId(User));
-            if (currentUser.Id != pin.AppUserId)
+            var (pin, isOwner) = _pinService.GetEditablePin(id, currentUserId);
+
+            if (pin == null)
+            {
+                return NotFound();
+            }
+
+            if (!isOwner)
             {
                 return Forbid();
             }
@@ -308,22 +159,24 @@ namespace Pinterest.Controllers
         }
 
         [HttpPost]
-        public ActionResult Edit(int id, Pin requestPin)
+        public IActionResult Edit(int id, Pin requestPin)
         {
-            Pin pin = db.Pins.Find(id);
+            var currentUserId = _userManager.GetUserId(User);
 
             try
             {
-                pin.Title = requestPin.Title;
-                pin.Description = requestPin.Description;
-                pin.Date = DateTime.Now;
-                db.SaveChanges();
+                bool updated = _pinService.TryUpdatePin(id, requestPin, currentUserId);
 
-                return RedirectToAction("Show", new { id = pin.Id });
+                if (!updated)
+                {
+                    return Forbid();
+                }
+
+                return RedirectToAction("Show", new { id = id });
             }
             catch (Exception)
             {
-                ViewBag.Pin = pin;
+                ViewBag.Pin = requestPin;
                 return View(requestPin);
             }
         }
@@ -332,104 +185,35 @@ namespace Pinterest.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int? id)
         {
-            Pin pin = db.Pins.Find(id);
+            var currentUser = await _userManager.GetUserAsync(User);
+            bool isAdmin = User.IsInRole("Admin");
 
-            AppUser currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser.Id != pin.AppUserId && !User.IsInRole("Admin"))
+            bool deleted = _pinService.TryDeletePin(id, currentUser, isAdmin, _env);
+
+            if (!deleted)
             {
                 return Forbid();
             }
 
-            string filePath = Path.Combine(_env.WebRootPath, pin.EmbeddedContentPath.TrimStart('/'));
-
-            if (System.IO.File.Exists(filePath))
-            {
-                System.IO.File.Delete(filePath);
-            }
-
-            db.Pins.Remove(pin);
-            db.SaveChanges();
-
             return RedirectToAction("Index");
         }
+
+
 
         [Authorize(Roles = "User")]
         [HttpPost]
         public IActionResult Like(int id)
         {
-            Pin pin = db.Pins.Find(id);
+            var userId = _userManager.GetUserId(User);
 
-            if (pin == null)
+            bool updated = _pinService.ToggleLike(id, userId);
+
+            if (!updated)
             {
                 return NotFound();
             }
 
-            AppUser currentUser = _userManager.GetUserAsync(User).Result;
-
-            // Verifica daca userul a dat like respectivului pin
-            bool hasLiked = db.Likes.Any(ul => ul.PinId == pin.Id && ul.AppUserId == currentUser.Id);
-
-            if (hasLiked)
-            {
-                // Daca userul a dat like la acest pin:
-                //  - se scade likescount cu 1
-                pin.LikesCount--;
-                //  - se sterge like-ul din tabela asociativa
-                UnlikePin(pin.Id, currentUser.Id);
-
-                return RedirectToAction("Show", new { id = pin.Id });
-            }
-
-            // Daca userul nu a dat like la acest pin:
-            //  - se creste likescount cu 1
-            pin.LikesCount++;
-            //  - se adauga like-ul in tabela asociativa
-            RecordUserLike(pin.Id);
-
-            return RedirectToAction("Show", new { id = pin.Id });
-        }
-
-        private void UnlikePin(int pinId, string userId)
-        {
-            // Gasesti like-ul respectiv
-            Like userLike = db.Likes.FirstOrDefault(ul => ul.PinId == pinId && ul.AppUserId == userId);
-
-            if (userLike != null)
-            {
-                // Stergi like-ul
-                db.Likes.Remove(userLike);
-                db.SaveChanges();
-            }
-        }
-
-        /*
-        private async Task<bool> HasUserLikedPin(int pinId)
-        {
-            AppUser currentUser = await _userManager.GetUserAsync(User);
-
-            if (currentUser == null)
-            {
-                return false;
-            }
-
-            // Verifica daca user-ul a dat like la pin sau nu
-            return db.Likes.Where(ul => ul.PinId == pinId && ul.AppUserId == currentUser.Id).Any();
-        }
-        */
-
-        private void RecordUserLike(int pinId)
-        {
-            AppUser currentUser = _userManager.GetUserAsync(User).Result;
-
-            // Adaugam like-ul in baza de date
-            Like userLike = new Like
-            {
-                PinId = pinId,
-                AppUserId = currentUser.Id
-            };
-
-            db.Likes.Add(userLike);
-            db.SaveChanges();
+            return RedirectToAction("Show", new { id = id });
         }
     }
 }
