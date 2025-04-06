@@ -25,6 +25,14 @@ namespace Pinterest.Services
                 : _repo.GetPinsBySearch(search);
 
             int totalItems = pins.Count();
+
+            if (perPage <= 0)
+            {
+                return (new List<Pin>(), 0, string.IsNullOrWhiteSpace(search)
+                    ? "/Pins/Index/?page"
+                    : $"/Pins/Index/?search={search}&page");
+            }
+
             int offset = (page - 1) * perPage;
 
             var paginatedPins = pins.Skip(offset).Take(perPage).ToList();
@@ -43,6 +51,14 @@ namespace Pinterest.Services
                 : _repo.GetPinsBySearch(search);
 
             int totalItems = pins.Count();
+
+            if (perPage <= 0)
+            {
+                return (new List<Pin>(), 0, string.IsNullOrWhiteSpace(search)
+                    ? "/Pins/IndexRecent/?page"
+                    : $"/Pins/IndexRecent/?search={search}&page");
+            }
+
             int offset = (page - 1) * perPage;
 
             var paginatedPins = pins.Skip(offset).Take(perPage).ToList();
@@ -94,6 +110,9 @@ namespace Pinterest.Services
                 var fileName = file.FileName;
                 var dbPath = $"/{folder}/{fileName}";
                 var physicalPath = Path.Combine(env.WebRootPath, folder, fileName);
+
+                // ne asiguram ca folderul exista
+                Directory.CreateDirectory(Path.GetDirectoryName(physicalPath));
 
                 using (var stream = new FileStream(physicalPath, FileMode.Create))
                 {

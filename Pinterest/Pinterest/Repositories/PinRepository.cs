@@ -17,12 +17,12 @@ namespace Pinterest.Repositories
 
 
 
-        public IQueryable<Pin> GetAllPinsOrderedByLikes()
+        public virtual IQueryable<Pin> GetAllPinsOrderedByLikes()
         {
             return _db.Pins.OrderByDescending(p => p.LikesCount);
         }
 
-        public IQueryable<Pin> GetPinsBySearch(string search)
+        public virtual IQueryable<Pin> GetPinsBySearch(string search)
         {
             var pinIds = _db.Pins
                 .Where(p => p.Title.Contains(search) || p.Description.Contains(search))
@@ -40,11 +40,11 @@ namespace Pinterest.Repositories
                 .OrderBy(p => p.Title);
         }
 
-        public IQueryable<Pin> GetAllPinsOrderedByDate()
+        public virtual IQueryable<Pin> GetAllPinsOrderedByDate()
         {
             return _db.Pins.OrderByDescending(p => p.Date);
         }
-        public Pin? GetPinWithCommentsAndAuthors(int? id)
+        public virtual Pin? GetPinWithCommentsAndAuthors(int? id)
         {
             return _db.Pins
                 .Include(p => p.Comments)
@@ -52,7 +52,7 @@ namespace Pinterest.Repositories
                 .FirstOrDefault(p => p.Id == id);
         }
 
-        public List<Category> GetAvailableCategoriesForUser(string userId, int? pinId)
+        public virtual List<Category> GetAvailableCategoriesForUser(string userId, int? pinId)
         {
             var usedCategoryIds = _db.PinCategories
                 .Where(pc => pc.PinId == pinId)
@@ -63,46 +63,46 @@ namespace Pinterest.Repositories
                 .ToList();
         }
 
-        public bool HasUserLikedPin(int pinId, string userId)
+        public virtual bool HasUserLikedPin(int pinId, string userId)
         {
             return _db.Likes.Any(like => like.PinId == pinId && like.AppUserId == userId);
         }
 
-        public void AddPin(Pin pin)
+        public virtual void AddPin(Pin pin)
         {
             _db.Pins.Add(pin);
             _db.SaveChanges();
         }
 
-        public Pin? GetPinById(int? id)
+        public virtual Pin? GetPinById(int? id)
         {
             return _db.Pins.Find(id);
         }
 
-        public AppUser? GetAppUserById(string userId)
+        public virtual AppUser? GetAppUserById(string userId)
         {
             return _db.AppUsers.Find(userId);
         }
 
-        public void UpdatePin(Pin pin)
+        public virtual void UpdatePin(Pin pin)
         {
             _db.SaveChanges();
         }
 
-        public void DeletePin(Pin pin)
+        public virtual void DeletePin(Pin pin)
         {
             _db.Pins.Remove(pin);
             _db.SaveChanges();
         }
 
-        public void AddLike(int pinId, string userId)
+        public virtual void AddLike(int pinId, string userId)
         {
             var like = new Like { PinId = pinId, AppUserId = userId };
             _db.Likes.Add(like);
             _db.SaveChanges();
         }
 
-        public void RemoveLike(int pinId, string userId)
+        public virtual void RemoveLike(int pinId, string userId)
         {
             var like = _db.Likes.FirstOrDefault(l => l.PinId == pinId && l.AppUserId == userId);
             if (like != null)
@@ -112,7 +112,7 @@ namespace Pinterest.Repositories
             }
         }
 
-        public void Save()
+        public virtual void Save()
         {
             _db.SaveChanges();
         }
