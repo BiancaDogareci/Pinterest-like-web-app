@@ -3,133 +3,108 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Pinterest.Data;
 using Pinterest.Models;
+using Pinterest.Services;
+using Pinterest.Repositories;
 
-namespace Pinterest.Controllers
+namespace Pinterest.Controllers;
+
+public class CategoriesController : Controller
 {
-    public class CategoriesController : Controller
+    private readonly IWebHostEnvironment _env;
+    private readonly UserManager<AppUser> _userManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly CategoryService _categoryService;
+
+    public CategoriesController(ApplicationDbContext context, IWebHostEnvironment env, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
     {
-        private readonly ApplicationDbContext db;
-        private IWebHostEnvironment _env;
+            
+        _env = env;
+        _userManager = userManager;
+        _roleManager = roleManager;
 
-        private readonly UserManager<AppUser> _userManager;
+        var categoryRepo = new CategoryRepository(context);
+        _categoryService = new CategoryService(categoryRepo);
+    }
 
-        private readonly RoleManager<IdentityRole> _roleManager;
+    [Authorize(Roles = "User")]
+    [HttpGet]
+    public async Task<IActionResult> Index()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        var categories = _categoryService.GetCategoriesForUser(user.Id);
 
-        public CategoriesController(ApplicationDbContext context, IWebHostEnvironment env, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
+        ViewBag.Categories = categories;
+        ViewBag.User = user;
+
+        return View();
+    }
+
+    [HttpGet]
+    public IActionResult Show(int? id)
+    {
+        var (pins, category) = _categoryService.GetCategoryWithPins(id);
+
+        ViewBag.Pins = pins;
+        ViewBag.Category = category;
+
+        return View();
+    }
+
+    [HttpGet]
+    public IActionResult New()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> New(Category category)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        category.AppUserId = user.Id;
+
+        if (!ModelState.IsValid)
         {
-            db = context;
-            _env = env;
-            _userManager = userManager;
-            _roleManager = roleManager;
-        }
-        [Authorize(Roles = "User")]
-        [HttpGet]
-        public IActionResult Index()
-        {
-            var user = _userManager.GetUserAsync(User).Result;
-
-            var categories = db.Categories
-                .Where(c => c.AppUserId == user.Id)
-                .ToList();
-
-            ViewBag.Categories = categories;
-            ViewBag.User = user;
-
-            return View();
-        }
-
-        [HttpGet]
-        public IActionResult Show(int? id)
-        {
-            var pins = from pc in db.PinCategories
-                       where pc.CategoryId == id
-                       join p in db.Pins on pc.PinId equals p.Id
-                       select p;
-
-            var categories = from c in db.Categories
-                             where c.Id == id
-                             select c;
-
-            ViewBag.Pins = pins.ToList();
-            ViewBag.Category = categories.SingleOrDefault();
-
-            return View();
-        }
-
-        [HttpGet]
-        public IActionResult New()
-        {
-            return View();
+            return View(category);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> New(Category category)
+        _categoryService.AddCategory(category);
+        return RedirectToAction("Index");
+    }
+
+    [HttpPost]
+    public IActionResult SavePin([FromForm] int categoryId, [FromForm] int pinId)
+    {
+        _categoryService.SavePinToCategory(categoryId, pinId);
+        return RedirectToAction("Index");
+    }
+
+    [Authorize(Roles = "User,Admin")]
+    [HttpPost]
+    public async Task<IActionResult> Delete([FromForm] int categoryId, [FromForm] int pinId)
+    {
+        var currentUser = await _userManager.GetUserAsync(User);
+        var success = _categoryService.RemovePinFromCategory(categoryId, pinId, currentUser.Id, User.IsInRole("Admin"));
+
+        if (!success)
         {
-            var user = await _userManager.GetUserAsync(User);
-
-            category.AppUserId = user.Id;
-
-            if (!ModelState.IsValid)
-            {
-                return View(category);
-            }
-
-            db.Categories.Add(category);
-
-            await db.SaveChangesAsync();
-
-            return RedirectToAction("Index");
+            return Forbid();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> SavePin([FromForm] int categoryId, [FromForm] int pinId)
+        return RedirectToAction("Show", new { id = categoryId });
+    }
+
+    [Authorize(Roles = "User,Admin")]
+    [HttpPost]
+    public async Task<IActionResult> Delete_Category(int categoryId)
+    {
+        var currentUser = await _userManager.GetUserAsync(User);
+        var success = _categoryService.DeleteCategory(categoryId, currentUser.Id, User.IsInRole("Admin"));
+
+        if (!success)
         {
-            PinCategory newPinCategory = new PinCategory();
-            newPinCategory.CategoryDate = DateTime.Now;
-            newPinCategory.CategoryId = categoryId;
-            newPinCategory.PinId = pinId;
-
-            db.PinCategories.Add(newPinCategory);
-            db.SaveChanges();
-
-            return RedirectToAction("Index");
+            return Forbid();
         }
 
-
-        [Authorize(Roles = "User,Admin")]
-        [HttpPost]
-        public async Task<IActionResult> Delete([FromForm] int categoryId, [FromForm] int pinId)
-        {
-            PinCategory pincategory = db.PinCategories.FirstOrDefault(pc => pc.CategoryId == categoryId && pc.PinId == pinId);
-
-            Category category = db.Categories.Find(pincategory.CategoryId);
-
-            AppUser currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser.Id != category.AppUserId && !User.IsInRole("Admin"))
-            {
-                return Forbid();
-            }
-
-            db.PinCategories.Remove(pincategory);
-            db.SaveChanges();
-            return RedirectToAction("Show", new { id = category.Id });
-        }
-
-        [Authorize(Roles = "User,Admin")]
-        [HttpPost]
-        public async Task<IActionResult> Delete_Category(int categoryId)
-        {
-            Category category = db.Categories.Find(categoryId);
-
-            AppUser currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser.Id != category.AppUserId && !User.IsInRole("Admin"))
-            {
-                return Forbid();
-            }
-
-            db.Categories.Remove(category);
-            db.SaveChanges();
-            return RedirectToAction("Index");
-        }
+        return RedirectToAction("Index");
     }
 }

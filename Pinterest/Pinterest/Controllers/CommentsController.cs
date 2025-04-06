@@ -1,116 +1,104 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Pinterest.Data;
 using Pinterest.Models;
+using Pinterest.Data;
+using Pinterest.Services;
+using Pinterest.Repositories;
 
-namespace Pinterest.Controllers
+namespace Pinterest.Controllers;
+
+public class CommentsController : Controller
 {
-    public class CommentsController : Controller
+    private readonly IWebHostEnvironment _env;
+    private readonly UserManager<AppUser> _userManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly CommentService _commentService;
+
+    public CommentsController(ApplicationDbContext context, IWebHostEnvironment env, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
     {
-        private readonly ApplicationDbContext db;
-        private IWebHostEnvironment _env;
+        _env = env;
+        _userManager = userManager;
+        _roleManager = roleManager;
 
-        private readonly UserManager<AppUser> _userManager;
+        var commentRepo = new CommentRepository(context);
+        _commentService = new CommentService(commentRepo);
+    }
 
-        private readonly RoleManager<IdentityRole> _roleManager;
+    [HttpGet]
+    public IActionResult Show(int? id)
+    {
+        var comment = _commentService.GetCommentById(id);
+        ViewBag.Comment = comment;
 
-        public CommentsController(ApplicationDbContext context, IWebHostEnvironment env, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
+        return View();
+    }
+
+    [Authorize(Roles = "User")]
+    [HttpGet]
+    public IActionResult New(int? pinId)
+    {
+        ViewBag.PinId = pinId;
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> New(Comment newComment, int pinId)
+    {
+        var userId = _userManager.GetUserId(User);
+        var (success, _) = _commentService.CreateComment(newComment, pinId, userId);
+
+        if (success)
         {
-            db = context;
-            _env = env;
-            _userManager = userManager;
-            _roleManager = roleManager;
+            return RedirectToAction("Show", "Pins", new { id = newComment.PinId });
         }
 
-        [HttpGet]
-        public IActionResult Show(int? id)
-        {
-            Comment comment = db.Comments.Find(id);
-            ViewBag.Comment = comment;
+        ViewBag.PinId = pinId;
+        return View(newComment);
+    }
 
-            return View();
+    [Authorize(Roles = "User")]
+    [HttpGet]
+    public IActionResult Edit(int? id)
+    {
+        var comment = _commentService.GetCommentById(id);
+        var currentUserId = _userManager.GetUserId(User);
+
+        if (comment?.AppUserId != currentUserId)
+        {
+            return Forbid();
         }
 
-        [Authorize(Roles = "User")]
-        [HttpGet]
-        public IActionResult New(int? pinId)
+        return View(comment);
+    }
+
+    [Authorize(Roles = "User")]
+    [HttpPost]
+    public IActionResult Edit(int id, Comment requestComment)
+    {
+        var result = _commentService.UpdateComment(id, requestComment);
+
+        if (result.success)
         {
-            ViewBag.PinId = pinId;
-               
-            return View();
-        }
-        [HttpPost]
-        public IActionResult New(Comment newComment, int pinId)
-        {
-            newComment.Date = DateTime.Now;
-            newComment.PinId = pinId;
-            newComment.AppUserId = _userManager.GetUserId(User);
-            
-            if (ModelState.IsValid)
-            {
-                db.Comments.Add(newComment);
-                db.SaveChanges();
-                return RedirectToAction("Show", "Pins", new { id = newComment.PinId });
-            }
-            else
-            {
-                ViewBag.PinId = pinId;
-                return View(newComment);          
-            }
+            return RedirectToAction("Show", "Pins", new { id = result.comment?.PinId });
         }
 
-        [Authorize(Roles = "User")]
-        [HttpGet]
-        public IActionResult Edit(int? id)
+        ViewBag.Comment = result.comment;
+        return View(requestComment);
+    }
+
+    [Authorize(Roles = "User,Admin")]
+    [HttpPost]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var currentUser = await _userManager.GetUserAsync(User);
+        var success = _commentService.TryDeleteComment(id, currentUser.Id, User.IsInRole("Admin"), out int? pinId);
+
+        if (!success)
         {
-            Comment comment = db.Comments.Find(id);
-
-            AppUser currentUser = db.AppUsers.Find(_userManager.GetUserId(User));
-            if (currentUser.Id != comment.AppUserId)
-            {
-                return Forbid();
-            }
-
-            return View(comment);
-        }
-        [Authorize(Roles = "User")]
-        [HttpPost]
-        public ActionResult Edit(int id, Comment requestComment)
-        {
-            Comment comment = db.Comments.Find(id);
-
-            try
-            {
-                comment.Text = requestComment.Text;
-                comment.Date = DateTime.Now;
-                db.SaveChanges();
-
-                return RedirectToAction("Show", "Pins", new { id = comment.PinId });
-            }
-            catch (Exception)
-            {
-                ViewBag.Comment = comment;
-                return View(requestComment);
-            }
+            return Forbid();
         }
 
-        [Authorize(Roles = "User,Admin")]
-        [HttpPost]
-        public async Task<IActionResult> Delete(int id)
-        {
-            Comment comment = db.Comments.Find(id);
-
-            AppUser currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser.Id != comment.AppUserId && !User.IsInRole("Admin"))
-            {
-                return Forbid();
-            }
-
-
-            db.Comments.Remove(comment);
-            db.SaveChanges();
-            return RedirectToAction("Show", "Pins", new { id = comment.PinId });
-        }
+        return RedirectToAction("Show", "Pins", new { id = pinId });
     }
 }
