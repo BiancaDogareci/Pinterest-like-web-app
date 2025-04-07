@@ -27,6 +27,9 @@ public class CategoryService
 
     public void AddCategory(Category category)
     {
+        if (category == null)
+            throw new ArgumentNullException(nameof(category));
+
         _repo.AddCategory(category);
     }
 

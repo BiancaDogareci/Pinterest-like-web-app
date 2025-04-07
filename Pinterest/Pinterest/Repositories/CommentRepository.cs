@@ -13,29 +13,29 @@ public class CommentRepository
         _db = db;
     }
 
-    public Comment? GetById(int? id)
+    public virtual Comment? GetById(int? id)
     {
         return _db.Comments.Find(id);
     }
 
-    public void Add(Comment comment)
+    public virtual void Add(Comment comment)
     {
         _db.Comments.Add(comment);
         _db.SaveChanges();
     }
 
-    public void Update(Comment comment)
+    public virtual void Update(Comment comment)
     {
         _db.SaveChanges();
     }
 
-    public void Delete(Comment comment)
+    public virtual void Delete(Comment comment)
     {
         _db.Comments.Remove(comment);
         _db.SaveChanges();
     }
 
-    public AppUser? GetUserById(string userId)
+    public virtual AppUser? GetUserById(string userId)
     {
         return _db.AppUsers.Find(userId);
     }

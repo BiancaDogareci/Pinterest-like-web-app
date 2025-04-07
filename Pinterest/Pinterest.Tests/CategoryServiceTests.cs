@@ -168,8 +168,6 @@ public class CategoryServiceTests
     
     
     // SavePinToCategory
-    // 1.
-    // 2.
     
     [Fact]
     public void SavePinToCategory_ValidData_CallsRepositoryMethod()
