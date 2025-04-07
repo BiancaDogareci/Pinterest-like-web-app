@@ -14,12 +14,22 @@ namespace Pinterest.Tests
 {
     public class PinServiceTests
     {
+
         //    GetPins
-        // fara search (search = "") - clasa de echivalenta
-        // cu search - clasa de echivalenta
-        // valoarea minima valida a paginii - analiza de frontiera
-        // valoarea mai mare fata de cea maxima valida a paginii - analiza de frontiera
-        // perPage = 0 - analiza defensiva
+        // search
+        // "", "test", null (valide) - t1, t2, t3, t4, t5, t6, t7, t8
+        // X (invalide)
+
+        // page
+        // <0 (invalid) - t8
+        // 0 (invalid) - t7
+        // 1 (valid) - t3
+        // n (valid) - t4
+        // >n (invalid) - t5
+
+        // perPage
+        // >0 (valide) - t1, t2, t3, t4, t5, t7, t8
+        // <=0 (invalide) - t6
 
 
         [Fact]
@@ -100,6 +110,32 @@ namespace Pinterest.Tests
         }
 
         [Fact]
+        public void GetPins_PageisN_ReturnsEmptyList()
+        {
+            // date si mock pentru PinRepository
+            var repoMock = new Mock<PinRepository>(null);
+
+            var pins = new List<Pin>
+            {
+                new Pin { Id = 1 },
+                new Pin { Id = 2 },
+                new Pin { Id = 3 }
+            }.AsQueryable();
+
+            repoMock.Setup(r => r.GetAllPinsOrderedByLikes()).Returns(pins);
+
+            var service = new PinService(repoMock.Object);
+
+            // apelam functia
+            var result = service.GetPins(search: "", page: 2, perPage: 2); // exista doar 2 pagini si se cere pagina 2
+
+            // verificari
+            Assert.Equal(1, result.Pins.Count()); // ultimul pin
+            Assert.Equal(2, result.LastPage);
+            Assert.Equal("/Pins/Index/?page", result.PaginationUrl);
+        }
+
+        [Fact]
         public void GetPins_PageGreaterThanTotalPages_ReturnsEmptyList()
         {
             // date si mock pentru PinRepository
@@ -145,6 +181,52 @@ namespace Pinterest.Tests
             var result = service.GetPins(search: "", page: 1, perPage: 0);
 
             // verificari
+            Assert.Empty(result.Pins);
+            Assert.Equal(0, result.LastPage);
+            Assert.Equal("/Pins/Index/?page", result.PaginationUrl);
+        }
+
+        [Fact]
+        public void GetPins_Pageis0()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+
+            var allPins = new List<Pin>
+            {
+                new Pin { Id = 1, Title = "A", LikesCount = 10 },
+                new Pin { Id = 2, Title = "B", LikesCount = 5 },
+                new Pin { Id = 3, Title = "C", LikesCount = 3 }
+            }.AsQueryable();
+
+            repoMock.Setup(r => r.GetAllPinsOrderedByLikes()).Returns(allPins);
+
+            var service = new PinService(repoMock.Object);
+
+            var result = service.GetPins(search: "", page: 0, perPage: 2);
+
+            Assert.Empty(result.Pins);
+            Assert.Equal(0, result.LastPage);
+            Assert.Equal("/Pins/Index/?page", result.PaginationUrl);
+        }
+
+        [Fact]
+        public void GetPins_PageisNegative()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+
+            var allPins = new List<Pin>
+            {
+                new Pin { Id = 1, Title = "A", LikesCount = 10 },
+                new Pin { Id = 2, Title = "B", LikesCount = 5 },
+                new Pin { Id = 3, Title = "C", LikesCount = 3 }
+            }.AsQueryable();
+
+            repoMock.Setup(r => r.GetAllPinsOrderedByLikes()).Returns(allPins);
+
+            var service = new PinService(repoMock.Object);
+
+            var result = service.GetPins(search: "", page: -1, perPage: 2);
+
             Assert.Empty(result.Pins);
             Assert.Equal(0, result.LastPage);
             Assert.Equal("/Pins/Index/?page", result.PaginationUrl);
