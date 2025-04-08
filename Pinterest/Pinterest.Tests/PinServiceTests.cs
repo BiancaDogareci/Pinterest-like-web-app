@@ -6,6 +6,7 @@ using Pinterest.Repositories;
 using Pinterest.Services;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,23 +18,25 @@ namespace Pinterest.Tests
 
         //    GetPins
         // search
-        // "", "test", null (valide) - t1, t2, t3, t4, t5, t6, t7, t8
-        // X (invalide)
+        // "", "test", null (valid) - t1, t2, t3
+        // nu exista invalid
 
         // page
-        // <0 (invalid) - t8
-        // 0 (invalid) - t7
-        // 1 (valid) - t3
-        // n (valid) - t4
-        // >n (invalid) - t5
+        // <0 (invalid) - t9
+        // 0 (invalid) - t8
+        // 1 (valid) - t4
+        // n (valid) - t5
+        // n+1 (invalid) - t6
+        // >n+1 (invalid) - t7
 
         // perPage
-        // >0 (valide) - t1, t2, t3, t4, t5, t7, t8
-        // <=0 (invalide) - t6
-
+        // <0 (invalid) - t11
+        // 0 (invalid) - t10
+        // 1 (valid) - t12
+        // >1 (valid) - t13
 
         [Fact]
-        public void GetPins_NoSearch_ReturnsPaginatedPinsOrderedByLikes()
+        public void GetPins_NoSearch_t1() //Returns Paginated Pins Ordered By Likes
         {
             // date si mock pentru PinRepository
             var repoMock = new Mock<PinRepository>(null);
@@ -59,7 +62,7 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void GetPins_WithSearch_ReturnsFilteredPins()
+        public void GetPins_WithSearch_t2()
         {
             // date si mock pentru PinRepository
             var repoMock = new Mock<PinRepository>(null);
@@ -84,7 +87,33 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void GetPins_PageOne_ReturnsFirstPage()
+        public void GetPins_SearchNull_t3()
+        {
+            // date si mock pentru PinRepository
+            var repoMock = new Mock<PinRepository>(null);
+
+            var allPins = new List<Pin>
+            {
+                new Pin { Id = 1, Title = "A", LikesCount = 10 },
+                new Pin { Id = 2, Title = "B", LikesCount = 5 },
+                new Pin { Id = 3, Title = "C", LikesCount = 3 }
+            }.AsQueryable();
+
+            repoMock.Setup(r => r.GetAllPinsOrderedByLikes()).Returns(allPins);
+
+            var service = new PinService(repoMock.Object);
+
+            // apelam functia
+            var result = service.GetPins(search: null, page: 1, perPage: 2);
+
+            // verificari
+            Assert.Equal(2, result.Pins.Count());
+            Assert.Equal(2, result.LastPage);
+            Assert.Equal("/Pins/Index/?page", result.PaginationUrl);
+        }
+
+        [Fact]
+        public void GetPins_PageOne_t4()
         {
             // date si mock pentru PinRepository
             var repoMock = new Mock<PinRepository>(null);
@@ -110,7 +139,7 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void GetPins_PageisN_ReturnsEmptyList()
+        public void GetPins_PageN_t5()
         {
             // date si mock pentru PinRepository
             var repoMock = new Mock<PinRepository>(null);
@@ -136,7 +165,7 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void GetPins_PageGreaterThanTotalPages_ReturnsEmptyList()
+        public void GetPins_PageNPlusOne_t6() // returns empty list
         {
             // date si mock pentru PinRepository
             var repoMock = new Mock<PinRepository>(null);
@@ -153,7 +182,7 @@ namespace Pinterest.Tests
             var service = new PinService(repoMock.Object);
 
             // apelam functia
-            var result = service.GetPins(search: "", page: 5, perPage: 2); // exista doar 2 pagini
+            var result = service.GetPins(search: "", page: 3, perPage: 2); // exista doar 2 pagini si se cere pagina 3 (n+1)
 
             // verificari
             Assert.Empty(result.Pins);
@@ -162,7 +191,79 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void GetPins_PerPageZero_ShouldHandleGracefully()
+        public void GetPins_PageGreaterThanNPlusOne_t7() // returns empty list
+        {
+            // date si mock pentru PinRepository
+            var repoMock = new Mock<PinRepository>(null);
+
+            var pins = new List<Pin>
+            {
+                new Pin { Id = 1 },
+                new Pin { Id = 2 },
+                new Pin { Id = 3 }
+            }.AsQueryable();
+
+            repoMock.Setup(r => r.GetAllPinsOrderedByLikes()).Returns(pins);
+
+            var service = new PinService(repoMock.Object);
+
+            // apelam functia
+            var result = service.GetPins(search: "", page: 5, perPage: 2); // exista doar 2 pagini si se cere pagina 5 (>n+1)
+
+            // verificari
+            Assert.Empty(result.Pins);
+            Assert.Equal(2, result.LastPage);
+            Assert.Equal("/Pins/Index/?page", result.PaginationUrl);
+        }
+
+        [Fact]
+        public void GetPins_PageZero_t8()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+
+            var allPins = new List<Pin>
+            {
+                new Pin { Id = 1, Title = "A", LikesCount = 10 },
+                new Pin { Id = 2, Title = "B", LikesCount = 5 },
+                new Pin { Id = 3, Title = "C", LikesCount = 3 }
+            }.AsQueryable();
+
+            repoMock.Setup(r => r.GetAllPinsOrderedByLikes()).Returns(allPins);
+
+            var service = new PinService(repoMock.Object);
+
+            var result = service.GetPins(search: "", page: 0, perPage: 2);
+
+            Assert.Empty(result.Pins);
+            Assert.Equal(0, result.LastPage);
+            Assert.Equal("/Pins/Index/?page", result.PaginationUrl);
+        }
+
+        [Fact]
+        public void GetPins_PageNegative_t9()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+
+            var allPins = new List<Pin>
+            {
+                new Pin { Id = 1, Title = "A", LikesCount = 10 },
+                new Pin { Id = 2, Title = "B", LikesCount = 5 },
+                new Pin { Id = 3, Title = "C", LikesCount = 3 }
+            }.AsQueryable();
+
+            repoMock.Setup(r => r.GetAllPinsOrderedByLikes()).Returns(allPins);
+
+            var service = new PinService(repoMock.Object);
+
+            var result = service.GetPins(search: "", page: -1, perPage: 2);
+
+            Assert.Empty(result.Pins);
+            Assert.Equal(0, result.LastPage);
+            Assert.Equal("/Pins/Index/?page", result.PaginationUrl);
+        }
+
+        [Fact]
+        public void GetPins_PerPageZero_t10()
         {
             // date si mock pentru PinRepository
             var repoMock = new Mock<PinRepository>(null);
@@ -187,71 +288,112 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void GetPins_Pageis0()
+        public void GetPins_PerPageNegative_t11()
         {
+            // date si mock pentru PinRepository
             var repoMock = new Mock<PinRepository>(null);
 
-            var allPins = new List<Pin>
+            var pins = new List<Pin>
             {
-                new Pin { Id = 1, Title = "A", LikesCount = 10 },
-                new Pin { Id = 2, Title = "B", LikesCount = 5 },
-                new Pin { Id = 3, Title = "C", LikesCount = 3 }
+                new Pin { Id = 1 },
+                new Pin { Id = 2 },
             }.AsQueryable();
 
-            repoMock.Setup(r => r.GetAllPinsOrderedByLikes()).Returns(allPins);
+            repoMock.Setup(r => r.GetAllPinsOrderedByLikes()).Returns(pins);
 
             var service = new PinService(repoMock.Object);
 
-            var result = service.GetPins(search: "", page: 0, perPage: 2);
+            // apelam functia
+            var result = service.GetPins(search: "", page: 1, perPage: -1);
 
+            // verificari
             Assert.Empty(result.Pins);
             Assert.Equal(0, result.LastPage);
             Assert.Equal("/Pins/Index/?page", result.PaginationUrl);
         }
 
         [Fact]
-        public void GetPins_PageisNegative()
+        public void GetPins_PerPageOne_t12()
         {
+            // date si mock pentru PinRepository
             var repoMock = new Mock<PinRepository>(null);
 
-            var allPins = new List<Pin>
+            var pins = new List<Pin>
             {
-                new Pin { Id = 1, Title = "A", LikesCount = 10 },
-                new Pin { Id = 2, Title = "B", LikesCount = 5 },
-                new Pin { Id = 3, Title = "C", LikesCount = 3 }
+                new Pin { Id = 1 },
+                new Pin { Id = 2 },
             }.AsQueryable();
 
-            repoMock.Setup(r => r.GetAllPinsOrderedByLikes()).Returns(allPins);
+            repoMock.Setup(r => r.GetAllPinsOrderedByLikes()).Returns(pins);
 
             var service = new PinService(repoMock.Object);
 
-            var result = service.GetPins(search: "", page: -1, perPage: 2);
+            // apelam functia
+            var result = service.GetPins(search: "", page: 1, perPage: 1);
 
-            Assert.Empty(result.Pins);
-            Assert.Equal(0, result.LastPage);
+            // verificari
+            Assert.Equal(1, result.Pins.Count()); // primul pin
+            Assert.Equal(2, result.LastPage);
+            Assert.Equal("/Pins/Index/?page", result.PaginationUrl);
+        }
+
+        [Fact]
+        public void GetPins_PerPageGreaterThanOne_t13()
+        {
+            // date si mock pentru PinRepository
+            var repoMock = new Mock<PinRepository>(null);
+
+            var pins = new List<Pin>
+            {
+                new Pin { Id = 1 },
+                new Pin { Id = 2 },
+            }.AsQueryable();
+
+            repoMock.Setup(r => r.GetAllPinsOrderedByLikes()).Returns(pins);
+
+            var service = new PinService(repoMock.Object);
+
+            // apelam functia
+            var result = service.GetPins(search: "", page: 1, perPage: 2);
+
+            // verificari
+            Assert.Equal(2, result.Pins.Count());
+            Assert.Equal(1, result.LastPage);
             Assert.Equal("/Pins/Index/?page", result.PaginationUrl);
         }
 
 
 
         //    GetRecentPins
-        // fara search (search = "") - clasa de echivalenta
-        // cu search - clasa de echivalenta
-        // valoarea minima valida a paginii - analiza de frontiera
-        // valoarea mai mare fata de cea maxima valida a paginii - analiza de frontiera
-        // perPage = 0 - analiza defensiva
+        // search
+        // "", "test", null (valid) - t1, t2, t3
+        // nu exista invalid
+
+        // page
+        // <0 (invalid) - t9
+        // 0 (invalid) - t8
+        // 1 (valid) - t4
+        // n (valid) - t5
+        // n+1 (invalid) - t6
+        // >n+1 (invalid) - t7
+
+        // perPage
+        // <0 (invalid) - t11
+        // 0 (invalid) - t10
+        // 1 (valid) - t12
+        // >1 (valid) - t13
 
         [Fact]
-        public void GetRecentPins_NoSearch_ReturnsPaginatedPinsOrderedByDate()
+        public void GetRecentPins_NoSearch_t1() //Returns Paginated Pins Ordered By Date
         {
-            // aranjeaza datele si mock pentru PinRepository
+            // date si mock pentru PinRepository
             var repoMock = new Mock<PinRepository>(null);
 
             var allPins = new List<Pin>
             {
-                new Pin { Id = 1, Date = DateTime.Now.AddDays(-1) },
-                new Pin { Id = 2, Date = DateTime.Now.AddDays(-2) },
-                new Pin { Id = 3, Date = DateTime.Now.AddDays(-3) },
+                new Pin { Id = 1, Title = "A", Date = DateTime.Now.AddDays(-1) },
+                new Pin { Id = 2, Title = "B", Date = DateTime.Now.AddDays(-2) },
+                new Pin { Id = 3, Title = "C", Date = DateTime.Now.AddDays(-3) }
             }.AsQueryable();
 
             repoMock.Setup(r => r.GetAllPinsOrderedByDate()).Returns(allPins);
@@ -268,49 +410,49 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void GetRecentPins_WithSearch_ReturnsFilteredPins()
+        public void GetRecentPins_WithSearch_t2()
         {
             // date si mock pentru PinRepository
             var repoMock = new Mock<PinRepository>(null);
 
             var filteredPins = new List<Pin>
             {
-                new Pin { Id = 1, Title = "TestA" },
-                new Pin { Id = 2, Title = "B" }
+                new Pin { Id = 1, Title = "testA", Date = DateTime.Now.AddDays(-1) },
+                new Pin { Id = 2, Title = "testB", Date = DateTime.Now.AddDays(-2) }
             }.AsQueryable();
 
-            repoMock.Setup(r => r.GetPinsBySearch("Test")).Returns(filteredPins);
+            repoMock.Setup(r => r.GetPinsBySearch("test")).Returns(filteredPins);
 
             var service = new PinService(repoMock.Object);
 
             // apelam functia
-            var result = service.GetRecentPinsWithSearch("Test", 1, 1);
+            var result = service.GetRecentPinsWithSearch(search: "test", page: 1, perPage: 1);
 
             // verificari
             Assert.Single(result.Pins);
-            Assert.Equal(2, result.LastPage);
-            Assert.Equal("/Pins/IndexRecent/?search=Test&page", result.PaginationUrl);
+            Assert.Equal(2, result.LastPage); // 2 obiecte in total, 1 pe pagina
+            Assert.Equal("/Pins/IndexRecent/?search=test&page", result.PaginationUrl);
         }
 
         [Fact]
-        public void GetRecentPins_PageOne_ReturnsFirstPage()
+        public void GetRecentPins_SearchNull_t3()
         {
             // date si mock pentru PinRepository
             var repoMock = new Mock<PinRepository>(null);
 
-            var pins = new List<Pin>
+            var allPins = new List<Pin>
             {
-                new Pin { Id = 1 },
-                new Pin { Id = 2 },
-                new Pin { Id = 3 }
+                new Pin { Id = 1, Title = "A", Date = DateTime.Now.AddDays(-1) },
+                new Pin { Id = 2, Title = "B", Date = DateTime.Now.AddDays(-2) },
+                new Pin { Id = 3, Title = "C", Date = DateTime.Now.AddDays(-3) }
             }.AsQueryable();
 
-            repoMock.Setup(r => r.GetAllPinsOrderedByDate()).Returns(pins);
+            repoMock.Setup(r => r.GetAllPinsOrderedByDate()).Returns(allPins);
 
             var service = new PinService(repoMock.Object);
 
             // apelam functia
-            var result = service.GetRecentPinsWithSearch("", 1, 2);
+            var result = service.GetRecentPinsWithSearch(search: null, page: 1, perPage: 2);
 
             // verificari
             Assert.Equal(2, result.Pins.Count());
@@ -319,15 +461,16 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void GetRecentPins_PageTooHigh_ReturnsEmptyList()
+        public void GetRecentPins_PageOne_t4()
         {
             // date si mock pentru PinRepository
             var repoMock = new Mock<PinRepository>(null);
 
             var pins = new List<Pin>
             {
-                new Pin { Id = 1 },
-                new Pin { Id = 2 },
+                new Pin { Id = 1, Date = DateTime.Now.AddDays(-1) },
+                new Pin { Id = 2, Date = DateTime.Now.AddDays(-2) },
+                new Pin { Id = 3, Date = DateTime.Now.AddDays(-3) }
             }.AsQueryable();
 
             repoMock.Setup(r => r.GetAllPinsOrderedByDate()).Returns(pins);
@@ -335,7 +478,59 @@ namespace Pinterest.Tests
             var service = new PinService(repoMock.Object);
 
             // apelam functia
-            var result = service.GetRecentPinsWithSearch("", 5, 1);
+            var result = service.GetRecentPinsWithSearch(search: "", page: 1, perPage: 2);
+
+            // verificari
+            Assert.Equal(2, result.Pins.Count()); // primele 2
+            Assert.Equal(2, result.LastPage);
+            Assert.Equal("/Pins/IndexRecent/?page", result.PaginationUrl);
+        }
+
+        [Fact]
+        public void GetRecentPins_PageN_t5()
+        {
+            // date si mock pentru PinRepository
+            var repoMock = new Mock<PinRepository>(null);
+
+            var pins = new List<Pin>
+            {
+                new Pin { Id = 1, Date = DateTime.Now.AddDays(-1) },
+                new Pin { Id = 2, Date = DateTime.Now.AddDays(-2) },
+                new Pin { Id = 3, Date = DateTime.Now.AddDays(-3) }
+            }.AsQueryable();
+
+            repoMock.Setup(r => r.GetAllPinsOrderedByDate()).Returns(pins);
+
+            var service = new PinService(repoMock.Object);
+
+            // apelam functia
+            var result = service.GetRecentPinsWithSearch(search: "", page: 2, perPage: 2); // exista doar 2 pagini si se cere pagina 2
+
+            // verificari
+            Assert.Equal(1, result.Pins.Count()); // ultimul pin
+            Assert.Equal(2, result.LastPage);
+            Assert.Equal("/Pins/IndexRecent/?page", result.PaginationUrl);
+        }
+
+        [Fact]
+        public void GetRecentPins_PageNPlusOne_t6() // returns empty list
+        {
+            // date si mock pentru PinRepository
+            var repoMock = new Mock<PinRepository>(null);
+
+            var pins = new List<Pin>
+            {
+                new Pin { Id = 1, Date = DateTime.Now.AddDays(-1) },
+                new Pin { Id = 2, Date = DateTime.Now.AddDays(-2) },
+                new Pin { Id = 3, Date = DateTime.Now.AddDays(-3) }
+            }.AsQueryable();
+
+            repoMock.Setup(r => r.GetAllPinsOrderedByDate()).Returns(pins);
+
+            var service = new PinService(repoMock.Object);
+
+            // apelam functia
+            var result = service.GetRecentPinsWithSearch(search: "", page: 3, perPage: 2); // exista doar 2 pagini si se cere pagina 3 (n+1)
 
             // verificari
             Assert.Empty(result.Pins);
@@ -344,15 +539,16 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void GetRecentPins_PerPageZero_ShouldReturnEmptyAndZeroPages()
+        public void GetRecentPins_PageGreaterThanNPlusOne_t7() // returns empty list
         {
             // date si mock pentru PinRepository
             var repoMock = new Mock<PinRepository>(null);
 
             var pins = new List<Pin>
             {
-                new Pin { Id = 1 },
-                new Pin { Id = 2 }
+                new Pin { Id = 1, Date = DateTime.Now.AddDays(-1) },
+                new Pin { Id = 2, Date = DateTime.Now.AddDays(-2) },
+                new Pin { Id = 3, Date = DateTime.Now.AddDays(-3) }
             }.AsQueryable();
 
             repoMock.Setup(r => r.GetAllPinsOrderedByDate()).Returns(pins);
@@ -360,7 +556,78 @@ namespace Pinterest.Tests
             var service = new PinService(repoMock.Object);
 
             // apelam functia
-            var result = service.GetRecentPinsWithSearch("", 1, 0);
+            var result = service.GetRecentPinsWithSearch(search: "", page: 5, perPage: 2); // exista doar 2 pagini si se cere pagina 5 (>n+1)
+
+            // verificari
+            Assert.Empty(result.Pins);
+            Assert.Equal(2, result.LastPage);
+            Assert.Equal("/Pins/IndexRecent/?page", result.PaginationUrl);
+        }
+
+        [Fact]
+        public void GetRecentPins_PageZero_t8()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+
+            var allPins = new List<Pin>
+            {
+                new Pin { Id = 1, Title = "A", Date = DateTime.Now.AddDays(-1) },
+                new Pin { Id = 2, Title = "B", Date = DateTime.Now.AddDays(-2) },
+                new Pin { Id = 3, Title = "C", Date = DateTime.Now.AddDays(-3) }
+            }.AsQueryable();
+
+            repoMock.Setup(r => r.GetAllPinsOrderedByDate()).Returns(allPins);
+
+            var service = new PinService(repoMock.Object);
+
+            var result = service.GetRecentPinsWithSearch(search: "", page: 0, perPage: 2);
+
+            Assert.Empty(result.Pins);
+            Assert.Equal(0, result.LastPage);
+            Assert.Equal("/Pins/IndexRecent/?page", result.PaginationUrl);
+        }
+
+        [Fact]
+        public void GetRecentPins_PageNegative_t9()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+
+            var allPins = new List<Pin>
+            {
+                new Pin { Id = 1, Title = "A", Date = DateTime.Now.AddDays(-1) },
+                new Pin { Id = 2, Title = "B", Date = DateTime.Now.AddDays(-2) },
+                new Pin { Id = 3, Title = "C", Date = DateTime.Now.AddDays(-3) }
+            }.AsQueryable();
+
+            repoMock.Setup(r => r.GetAllPinsOrderedByDate()).Returns(allPins);
+
+            var service = new PinService(repoMock.Object);
+
+            var result = service.GetRecentPinsWithSearch(search: "", page: -1, perPage: 2);
+
+            Assert.Empty(result.Pins);
+            Assert.Equal(0, result.LastPage);
+            Assert.Equal("/Pins/IndexRecent/?page", result.PaginationUrl);
+        }
+
+        [Fact]
+        public void GetRecentPins_PerPageZero_t10()
+        {
+            // date si mock pentru PinRepository
+            var repoMock = new Mock<PinRepository>(null);
+
+            var pins = new List<Pin>
+            {
+                new Pin { Id = 1, Date = DateTime.Now.AddDays(-1) },
+                new Pin { Id = 2, Date = DateTime.Now.AddDays(-2) },
+            }.AsQueryable();
+
+            repoMock.Setup(r => r.GetAllPinsOrderedByDate()).Returns(pins);
+
+            var service = new PinService(repoMock.Object);
+
+            // apelam functia
+            var result = service.GetRecentPinsWithSearch(search: "", page: 1, perPage: 0);
 
             // verificari
             Assert.Empty(result.Pins);
@@ -368,15 +635,94 @@ namespace Pinterest.Tests
             Assert.Equal("/Pins/IndexRecent/?page", result.PaginationUrl);
         }
 
+        [Fact]
+        public void GetRecentPins_PerPageNegative_t11()
+        {
+            // date si mock pentru PinRepository
+            var repoMock = new Mock<PinRepository>(null);
+
+            var pins = new List<Pin>
+            {
+                new Pin { Id = 1, Date = DateTime.Now.AddDays(-1) },
+                new Pin { Id = 2, Date = DateTime.Now.AddDays(-2) },
+            }.AsQueryable();
+
+            repoMock.Setup(r => r.GetAllPinsOrderedByDate()).Returns(pins);
+
+            var service = new PinService(repoMock.Object);
+
+            // apelam functia
+            var result = service.GetRecentPinsWithSearch(search: "", page: 1, perPage: -1);
+
+            // verificari
+            Assert.Empty(result.Pins);
+            Assert.Equal(0, result.LastPage);
+            Assert.Equal("/Pins/IndexRecent/?page", result.PaginationUrl);
+        }
+
+        [Fact]
+        public void GetRecentPins_PerPageOne_t12()
+        {
+            // date si mock pentru PinRepository
+            var repoMock = new Mock<PinRepository>(null);
+
+            var pins = new List<Pin>
+            {
+                new Pin { Id = 1, Date = DateTime.Now.AddDays(-1) },
+                new Pin { Id = 2, Date = DateTime.Now.AddDays(-2) },
+            }.AsQueryable();
+
+            repoMock.Setup(r => r.GetAllPinsOrderedByDate()).Returns(pins);
+
+            var service = new PinService(repoMock.Object);
+
+            // apelam functia
+            var result = service.GetRecentPinsWithSearch(search: "", page: 1, perPage: 1);
+
+            // verificari
+            Assert.Equal(1, result.Pins.Count()); // primul pin
+            Assert.Equal(2, result.LastPage);
+            Assert.Equal("/Pins/IndexRecent/?page", result.PaginationUrl);
+        }
+
+        [Fact]
+        public void GetRecentPins_PerPageGreaterThanOne_t13()
+        {
+            // date si mock pentru PinRepository
+            var repoMock = new Mock<PinRepository>(null);
+
+            var pins = new List<Pin>
+            {
+                new Pin { Id = 1, Date = DateTime.Now.AddDays(-1)},
+                new Pin { Id = 2, Date = DateTime.Now.AddDays(-2) },
+            }.AsQueryable();
+
+            repoMock.Setup(r => r.GetAllPinsOrderedByDate()).Returns(pins);
+
+            var service = new PinService(repoMock.Object);
+
+            // apelam functia
+            var result = service.GetRecentPinsWithSearch(search: "", page: 1, perPage: 2);
+
+            // verificari
+            Assert.Equal(2, result.Pins.Count());
+            Assert.Equal(1, result.LastPage);
+            Assert.Equal("/Pins/IndexRecent/?page", result.PaginationUrl);
+        }
+
 
 
         //    GetPinDetails
-        // pin inexistent
-        // pin existent + fara like + cu categorii
-        // pin existent + cu like + cu categorii
-        // pin existent + fara categorii
+        // pin - existent sau inexistent
+
+        // pin inexistent - t1
+        // pin existent + fara like + fara categorii - t2
+        // pin existent + fara like + cu categorii - t3
+        // pin existent + cu like + fara categorii - t4
+        // pin existent + cu like + cu categorii - t5
+
         [Fact]
-        public void GetPinDetails_PinNotFound_ReturnsNullEmptyFalse()
+        public void GetPinDetails_PinNotFound_t1()
         {
             var repoMock = new Mock<PinRepository>(null);
             var service = new PinService(repoMock.Object);
@@ -393,7 +739,29 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void GetPinDetails_PinExists_NotLiked_CategoriesExist_ReturnsCorrectData()
+        public void GetPinDetails_PinExists_NotLiked_NoCategories_t2()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+            var service = new PinService(repoMock.Object);
+
+            var user = new AppUser { Id = "user2" };
+            var pin = new Pin { Id = 2 };
+
+            var categories = new List<Category>();
+
+            repoMock.Setup(r => r.GetPinWithCommentsAndAuthors(2)).Returns(pin);
+            repoMock.Setup(r => r.GetAvailableCategoriesForUser("user2", 2)).Returns(categories);
+            repoMock.Setup(r => r.HasUserLikedPin(2, "user2")).Returns(false);
+
+            var result = service.GetPinDetails(2, user);
+
+            Assert.Equal(pin, result.Pin);
+            Assert.Empty(result.Categories);
+            Assert.False(result.HasLiked);
+        }
+
+        [Fact]
+        public void GetPinDetails_PinExists_NotLiked_CategoriesExist_t3()
         {
             var repoMock = new Mock<PinRepository>(null);
             var service = new PinService(repoMock.Object);
@@ -418,7 +786,29 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void GetPinDetails_PinExists_Liked_CategoriesExist_ReturnsCorrectData()
+        public void GetPinDetails_PinExists_Liked_NoCategories_t4()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+            var service = new PinService(repoMock.Object);
+
+            var user = new AppUser { Id = "user2" };
+            var pin = new Pin { Id = 2 };
+
+            var categories = new List<Category>();
+
+            repoMock.Setup(r => r.GetPinWithCommentsAndAuthors(2)).Returns(pin);
+            repoMock.Setup(r => r.GetAvailableCategoriesForUser("user2", 2)).Returns(categories);
+            repoMock.Setup(r => r.HasUserLikedPin(2, "user2")).Returns(true);
+
+            var result = service.GetPinDetails(2, user);
+
+            Assert.Equal(pin, result.Pin);
+            Assert.Empty(result.Categories);
+            Assert.True(result.HasLiked);
+        }
+
+        [Fact]
+        public void GetPinDetails_PinExists_Liked_CategoriesExist_t5()
         {
             var repoMock = new Mock<PinRepository>(null);
             var service = new PinService(repoMock.Object);
@@ -442,33 +832,13 @@ namespace Pinterest.Tests
             Assert.True(result.HasLiked);
         }
 
-        [Fact]
-        public void GetPinDetails_PinExists_NoCategories_ReturnsEmptyCategoryList()
-        {
-            var repoMock = new Mock<PinRepository>(null);
-            var service = new PinService(repoMock.Object);
-
-            var user = new AppUser { Id = "user1" };
-            var pin = new Pin { Id = 1 };
-
-            repoMock.Setup(r => r.GetPinWithCommentsAndAuthors(1)).Returns(pin);
-            repoMock.Setup(r => r.GetAvailableCategoriesForUser("user1", 1)).Returns(new List<Category>());
-            repoMock.Setup(r => r.HasUserLikedPin(1, "user1")).Returns(false);
-
-            var result = service.GetPinDetails(1, user);
-
-            Assert.Equal(pin, result.Pin);
-            Assert.Empty(result.Categories);
-            Assert.False(result.HasLiked);
-        }
-
 
 
         //    GetPinForGeneralView
-        // pin gasit
-        // pin inexistent
+        // pin gasit - t1
+        // pin inexistent - t2
         [Fact]
-        public void GetPinForGeneralView_PinExists_ReturnsPin()
+        public void GetPinForGeneralView_PinExists_ReturnsPin_t1()
         {
             var repoMock = new Mock<PinRepository>(null);
             var service = new PinService(repoMock.Object);
@@ -483,7 +853,7 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void GetPinForGeneralView_PinNotFound_ReturnsNull()
+        public void GetPinForGeneralView_PinNotFound_ReturnsNull_t2()
         {
             var repoMock = new Mock<PinRepository>(null);
             var service = new PinService(repoMock.Object);
@@ -498,10 +868,34 @@ namespace Pinterest.Tests
 
 
         //    CreatePinAsync
-        // fisier imagine valid + model valid
-        // fisier cu tip invalid + model valid
-        // model invalid
-        // fara fisier
+        // pt ca un pin sa fie valid:
+        // Title - [Required], [StringLength(20)]
+        // Description - [Required]
+        // EmbeddedContentPath - [Required] (doar daca ai fisier)
+
+        // MODEL
+        // title
+        // null (invalid) - t1
+        // "" (invalid) - t2
+        // 1 caracter (valid) - t3
+        // 20 caractere (valid) - t4
+        // 21 caractere (invalid) - t5
+        // > 21 caractere (invalid) - t6
+
+        // description
+        // null (invalid) - t7
+        // "" (invalid) - t8
+        // > 0 caractere (valid) - t9
+
+        // EmbeddedContentPath
+        // null (invalid) - t10
+        // "" (invalid) - t11
+        // > 0 caractere (valid) - t12
+
+        // FISIER
+        // fisier imagine valid - t13
+        // fisier cu tip invalid - t14
+
         private IFormFile CreateMockFile(string fileName, string contentType)
         {
             var content = "Fake content";
@@ -518,7 +912,248 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public async Task CreatePinAsync_ValidImageFile_ValidModel_ReturnsTrue()
+        public async Task CreatePinAsync_TitleNull_t1()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+            var service = new PinService(repoMock.Object);
+
+            var user = new AppUser { Id = "user1" };
+            var env = Mock.Of<IWebHostEnvironment>(e => e.WebRootPath == "wwwroot");
+
+            var pin = new Pin 
+            { 
+                Title = null, 
+                Description = "Desc", 
+                EmbeddedContentPath = "/x.jpg" 
+            };
+
+            var result = await service.CreatePinAsync(pin, null, user, env);
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public async Task CreatePinAsync_TitleEmpty_t2()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+            var service = new PinService(repoMock.Object);
+
+            var user = new AppUser { Id = "user1" };
+            var env = Mock.Of<IWebHostEnvironment>(e => e.WebRootPath == "wwwroot");
+
+            var pin = new Pin
+            {
+                Title = "",
+                Description = "Desc",
+                EmbeddedContentPath = "/x.jpg"
+            };
+
+            var result = await service.CreatePinAsync(pin, null, user, env);
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public async Task CreatePinAsync_TitleOneCharacter_t3()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+            var service = new PinService(repoMock.Object);
+
+            var user = new AppUser { Id = "user1" };
+            var env = Mock.Of<IWebHostEnvironment>(e => e.WebRootPath == "wwwroot");
+
+            var pin = new Pin
+            {
+                Title = "A",
+                Description = "Desc",
+                EmbeddedContentPath = "/x.jpg"
+            };
+
+            var result = await service.CreatePinAsync(pin, null, user, env);
+            Assert.True(result.IsValid);
+        }
+
+        [Fact]
+        public async Task CreatePinAsync_Title20Characters_t4()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+            var service = new PinService(repoMock.Object);
+
+            var user = new AppUser { Id = "user1" };
+            var env = Mock.Of<IWebHostEnvironment>(e => e.WebRootPath == "wwwroot");
+
+            var pin = new Pin
+            {
+                Title = "AAAAAAAAAAAAAAAAAAAA",
+                Description = "Desc",
+                EmbeddedContentPath = "/x.jpg"
+            };
+
+            var result = await service.CreatePinAsync(pin, null, user, env);
+            Assert.True(result.IsValid);
+        }
+
+        [Fact]
+        public async Task CreatePinAsync_Title21Characters_t5()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+            var service = new PinService(repoMock.Object);
+
+            var user = new AppUser { Id = "user1" };
+            var env = Mock.Of<IWebHostEnvironment>(e => e.WebRootPath == "wwwroot");
+
+            var pin = new Pin
+            {
+                Title = "AAAAAAAAAAAAAAAAAAAAA",
+                Description = "Desc",
+                EmbeddedContentPath = "/x.jpg"
+            };
+
+            var result = await service.CreatePinAsync(pin, null, user, env);
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public async Task CreatePinAsync_TitleGreaterThan21Characters_t6()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+            var service = new PinService(repoMock.Object);
+
+            var user = new AppUser { Id = "user1" };
+            var env = Mock.Of<IWebHostEnvironment>(e => e.WebRootPath == "wwwroot");
+
+            var pin = new Pin
+            {
+                Title = "AAAAAAAAAAAAAAAAAAAAAAAA",
+                Description = "Desc",
+                EmbeddedContentPath = "/x.jpg"
+            };
+
+            var result = await service.CreatePinAsync(pin, null, user, env);
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public async Task CreatePinAsync_DescriptionNull_t7()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+            var service = new PinService(repoMock.Object);
+
+            var user = new AppUser { Id = "user1" };
+            var env = Mock.Of<IWebHostEnvironment>(e => e.WebRootPath == "wwwroot");
+
+            var pin = new Pin
+            {
+                Title = "A",
+                Description = null,
+                EmbeddedContentPath = "/x.jpg"
+            };
+
+            var result = await service.CreatePinAsync(pin, null, user, env);
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public async Task CreatePinAsync_DescriptionEmpty_t8()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+            var service = new PinService(repoMock.Object);
+
+            var user = new AppUser { Id = "user1" };
+            var env = Mock.Of<IWebHostEnvironment>(e => e.WebRootPath == "wwwroot");
+
+            var pin = new Pin
+            {
+                Title = "A",
+                Description = "",
+                EmbeddedContentPath = "/x.jpg"
+            };
+
+            var result = await service.CreatePinAsync(pin, null, user, env);
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public async Task CreatePinAsync_DescriptionOneCharacter_t9()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+            var service = new PinService(repoMock.Object);
+
+            var user = new AppUser { Id = "user1" };
+            var env = Mock.Of<IWebHostEnvironment>(e => e.WebRootPath == "wwwroot");
+
+            var pin = new Pin
+            {
+                Title = "A",
+                Description = "Desc",
+                EmbeddedContentPath = "/x.jpg"
+            };
+
+            var result = await service.CreatePinAsync(pin, null, user, env);
+            Assert.True(result.IsValid);
+        }
+
+        [Fact]
+        public async Task CreatePinAsync_EmbeddedContentPathNull_t10()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+            var service = new PinService(repoMock.Object);
+
+            var user = new AppUser { Id = "user1" };
+            var env = Mock.Of<IWebHostEnvironment>(e => e.WebRootPath == "wwwroot");
+
+            var pin = new Pin
+            {
+                Title = "A",
+                Description = "Desc",
+                EmbeddedContentPath = null
+            };
+
+            var result = await service.CreatePinAsync(pin, null, user, env);
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public async Task CreatePinAsync_EmbeddedContentPathEmpty_t11()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+            var service = new PinService(repoMock.Object);
+
+            var user = new AppUser { Id = "user1" };
+            var env = Mock.Of<IWebHostEnvironment>(e => e.WebRootPath == "wwwroot");
+
+            var pin = new Pin
+            {
+                Title = "A",
+                Description = "Desc",
+                EmbeddedContentPath = ""
+            };
+
+            var result = await service.CreatePinAsync(pin, null, user, env);
+            Assert.False(result.IsValid);
+        }
+
+        [Fact]
+        public async Task CreatePinAsync_EmbeddedContentPathOneCharacter_t12()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+            var service = new PinService(repoMock.Object);
+
+            var user = new AppUser { Id = "user1" };
+            var env = Mock.Of<IWebHostEnvironment>(e => e.WebRootPath == "wwwroot");
+
+            var pin = new Pin
+            {
+                Title = "A",
+                Description = "Desc",
+                EmbeddedContentPath = "a"
+            };
+
+            var result = await service.CreatePinAsync(pin, null, user, env);
+            Assert.True(result.IsValid);
+        }
+
+
+        [Fact]
+        public async Task CreatePinAsync_ValidImageFile_t13()
         {
             var repoMock = new Mock<PinRepository>(null);
             var service = new PinService(repoMock.Object);
@@ -542,7 +1177,7 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public async Task CreatePinAsync_InvalidFileType_ReturnsUnsupportedMedia()
+        public async Task CreatePinAsync_InvalidFileType_ReturnsUnsupportedMedia_t14()
         {
             var repoMock = new Mock<PinRepository>(null);
             var service = new PinService(repoMock.Object);
@@ -565,60 +1200,15 @@ namespace Pinterest.Tests
             repoMock.Verify(r => r.AddPin(It.IsAny<Pin>()), Times.Never);
         }
 
-        [Fact]
-        public async Task CreatePinAsync_InvalidModel_ReturnsValidationError()
-        {
-            var repoMock = new Mock<PinRepository>(null);
-            var service = new PinService(repoMock.Object);
-
-            var user = new AppUser { Id = "user1" };
-            var env = Mock.Of<IWebHostEnvironment>(e => e.WebRootPath == "wwwroot");
-
-            var file = CreateMockFile("image.jpg", "image/jpeg");
-
-            var pin = new Pin
-            {
-                Title = "", // invalid, nu poate sa fie null
-                Description = "Description"
-            };
-
-            var result = await service.CreatePinAsync(pin, file, user, env);
-
-            Assert.False(result.IsValid);
-            Assert.Equal("Model validation failed.", result.ErrorMessage);
-            repoMock.Verify(r => r.AddPin(It.IsAny<Pin>()), Times.Never);
-        }
-
-        [Fact]
-        public async Task CreatePinAsync_NoFileProvided_StillValidIfModelValid()
-        {
-            var repoMock = new Mock<PinRepository>(null);
-            var service = new PinService(repoMock.Object);
-
-            var user = new AppUser { Id = "user1" };
-            var env = Mock.Of<IWebHostEnvironment>(e => e.WebRootPath == "wwwroot");
-
-            var pin = new Pin
-            {
-                Title = "Title",
-                Description = "Description"
-            };
-
-            var result = await service.CreatePinAsync(pin, null, user, env);
-
-            Assert.False(result.IsValid);
-            Assert.Equal("Model validation failed.", result.ErrorMessage);
-            repoMock.Verify(r => r.AddPin(It.IsAny<Pin>()), Times.Never);
-        }
-
 
 
         //    GetEditablePin
-        // pin inexistent
-        // pin existent + user-ul e owner
-        // pin existent + user-ul nu e owner
+        // pin inexistent - t1
+        // pin existent + user-ul e owner - t2
+        // pin existent + user-ul nu e owner - t3
+
         [Fact]
-        public void GetEditablePin_PinNotFound_ReturnsNullAndFalse()
+        public void GetEditablePin_PinNotFound_ReturnsNullAndFalse_t1()
         {
             var repoMock = new Mock<PinRepository>(null);
             repoMock.Setup(r => r.GetPinById(1)).Returns((Pin)null);
@@ -632,7 +1222,7 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void GetEditablePin_UserIsOwner_ReturnsPinAndTrue()
+        public void GetEditablePin_UserIsOwner_ReturnsPinAndTrue_t2()
         {
             var pin = new Pin 
             { 
@@ -652,7 +1242,7 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void GetEditablePin_UserIsNotOwner_ReturnsPinAndFalse()
+        public void GetEditablePin_UserIsNotOwner_ReturnsPinAndFalse_t3()
         {
             var pin = new Pin 
             { 
@@ -674,11 +1264,12 @@ namespace Pinterest.Tests
 
 
         //    TryUpdatePin
-        // pin inexistent
-        // pin existent + user-ul e owner
-        // pin existent + user-ul nu e owner
+        // pin inexistent - t1
+        // pin existent + user-ul e owner - t2
+        // pin existent + user-ul nu e owner - t3
+
         [Fact]
-        public void TryUpdatePin_PinNotFound_ReturnsFalse()
+        public void TryUpdatePin_PinNotFound_ReturnsFalse_t1()
         {
             var repoMock = new Mock<PinRepository>(null);
             repoMock.Setup(r => r.GetPinById(1)).Returns((Pin)null);
@@ -698,7 +1289,7 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void TryUpdatePin_UserIsOwne_UpdatesAndReturnsTrue()
+        public void TryUpdatePin_UserIsOwne_UpdatesAndReturnsTrue_t2()
         {
             var existingPin = new Pin
             {
@@ -728,7 +1319,7 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void TryUpdatePin_UserIsNotOwner_ReturnsFalse()
+        public void TryUpdatePin_UserIsNotOwner_ReturnsFalse_t3()
         {
             var existingPin = new Pin 
             { 
@@ -758,12 +1349,15 @@ namespace Pinterest.Tests
 
 
         //    TryDeletePin
-        // pin inexistent
-        // pin existent + user-ul nu e owner si nici admin
-        // pin existent + user-ul e owner + fisierul exista
-        // pin existent + user-ul e owner + fisierul nu exista
+        // pin inexistent - t1
+        // pin existent + user-ul nu e owner si nici admin - t2
+        // pin existent + user-ul e owner + fisierul exista - t3
+        // pin existent + user-ul e owner + fisierul nu exista - t4
+        // pin existent + user-ul e admin + fisierul exista - t5
+        // pin existent + user-ul e admin + fisierul nu exista - t6
+
         [Fact]
-        public void TryDeletePin_PinNotFound_ReturnsFalse()
+        public void TryDeletePin_PinNotFound_ReturnsFalse_t1()
         {
             var repoMock = new Mock<PinRepository>(null);
             var service = new PinService(repoMock.Object);
@@ -783,7 +1377,7 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void TryDeletePin_UserIsNotOwnerAndNotAdmin_ReturnsFalse()
+        public void TryDeletePin_UserIsNotOwnerAndNotAdmin_ReturnsFalse_t2()
         {
             var pin = new Pin 
             { 
@@ -810,7 +1404,7 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void TryDeletePin_UserIsOwner_FileExists_DeletesFileAndPin()
+        public void TryDeletePin_UserIsOwner_FileExists_t3()
         {
             var pin = new Pin
             {
@@ -844,7 +1438,7 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void TryDeletePin_UserIsOwner_FileDoesNotExist_DeletesPinOnly()
+        public void TryDeletePin_UserIsOwner_FileDoesNotExist_DeletesPinOnly_t4()
         {
             var pin = new Pin
             {
@@ -870,15 +1464,86 @@ namespace Pinterest.Tests
             repoMock.Verify(r => r.DeletePin(pin), Times.Once);
         }
 
+        [Fact]
+        public void TryDeletePin_UserIsAdmin_FileExists_t5()
+        {
+            var pin = new Pin
+            {
+                Id = 1,
+                AppUserId = "user123",
+                EmbeddedContentPath = "/images/img.jpg"
+            };
+
+            var repoMock = new Mock<PinRepository>(null);
+            repoMock.Setup(r => r.GetPinById(1)).Returns(pin);
+
+            var service = new PinService(repoMock.Object);
+
+            var env = Mock.Of<IWebHostEnvironment>(e => e.WebRootPath == "testroot");
+            var fullPath = Path.Combine(env.WebRootPath, pin.EmbeddedContentPath.TrimStart('/'));
+
+            // fisier fals 
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
+            File.WriteAllText(fullPath, "mock data");
+
+            var result = service.TryDeletePin(1, new AppUser(), true, env);
+
+            Assert.True(result);
+            Assert.False(File.Exists(fullPath)); // fisierul ar trebui sa fie sters
+            repoMock.Verify(r => r.DeletePin(pin), Times.Once);
+        }
+
+        [Fact]
+        public void TryDeletePin_UserIsAdmin_FileDoesNotExist_DeletesPinOnly_t6()
+        {
+            var pin = new Pin
+            {
+                Id = 1,
+                AppUserId = "user123",
+                EmbeddedContentPath = "/images/missing.jpg"
+            };
+
+            var repoMock = new Mock<PinRepository>(null);
+            repoMock.Setup(r => r.GetPinById(1)).Returns(pin);
+
+            var service = new PinService(repoMock.Object);
+            var env = Mock.Of<IWebHostEnvironment>(e => e.WebRootPath == "testroot");
+
+            var result = service.TryDeletePin(1, new AppUser(), true, env);
+
+            Assert.True(result);
+            repoMock.Verify(r => r.DeletePin(pin), Times.Once);
+        }
+
 
 
         //    ToggleLike
-        // pin existent + utilizatorul nu a dat like
-        // pin existent + utilizatorul a dat like
-        // pin inexistent
+        // pin inexistent - t1
+        // pin existent + utilizatorul nu a dat like - t2
+        // pin existent + utilizatorul a dat like - t3
 
         [Fact]
-        public void ToggleLike_UserHasNotLikedBefore_ShouldAddLikeAndIncrementCount()
+        public void ToggleLike_PinDoesNotExist_t1()
+        {
+            var pinId = 1;
+            var userId = "user123";
+
+            var repoMock = new Mock<PinRepository>(null);
+            repoMock.Setup(r => r.GetPinById(pinId)).Returns((Pin)null);
+
+            var service = new PinService(repoMock.Object);
+
+            var result = service.ToggleLike(pinId, userId);
+
+            Assert.False(result);
+            repoMock.Verify(r => r.HasUserLikedPin(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
+            repoMock.Verify(r => r.AddLike(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
+            repoMock.Verify(r => r.RemoveLike(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
+            repoMock.Verify(r => r.Save(), Times.Never);
+        }
+
+        [Fact]
+        public void ToggleLike_UserHasNotLikedBefore_ShouldAddLikeAndIncrementCount_t2()
         {
             var pinId = 1;
             var userId = "user123";
@@ -905,7 +1570,7 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void ToggleLike_UserAlreadyLiked_ShouldRemoveLikeAndDecrementCount()
+        public void ToggleLike_UserAlreadyLiked_ShouldRemoveLikeAndDecrementCount_t3()
         {
             var pinId = 1;
             var userId = "user123";
@@ -929,26 +1594,6 @@ namespace Pinterest.Tests
             Assert.Equal(0, pin.LikesCount);
             repoMock.Verify(r => r.RemoveLike(pinId, userId), Times.Once);
             repoMock.Verify(r => r.Save(), Times.Once);
-        }
-
-        [Fact]
-        public void ToggleLike_PinDoesNotExist_ShouldReturnFalse()
-        {
-            var pinId = 1;
-            var userId = "user123";
-
-            var repoMock = new Mock<PinRepository>(null);
-            repoMock.Setup(r => r.GetPinById(pinId)).Returns((Pin)null);
-
-            var service = new PinService(repoMock.Object);
-
-            var result = service.ToggleLike(pinId, userId);
-
-            Assert.False(result);
-            repoMock.Verify(r => r.HasUserLikedPin(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
-            repoMock.Verify(r => r.AddLike(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
-            repoMock.Verify(r => r.RemoveLike(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
-            repoMock.Verify(r => r.Save(), Times.Never);
         }
 
 

@@ -52,7 +52,7 @@ namespace Pinterest.Services
 
             int totalItems = pins.Count();
 
-            if (perPage <= 0)
+            if (perPage <= 0 || page <= 0)
             {
                 return (new List<Pin>(), 0, string.IsNullOrWhiteSpace(search)
                     ? "/Pins/IndexRecent/?page"
