@@ -13,6 +13,11 @@ https://github.com/BiancaDogareci/Social_Bookmarking_Web_Application/assets/1191
 ### Admin user
 https://github.com/BiancaDogareci/Social_Bookmarking_Web_Application/assets/119197457/abe527ed-4ee7-4cf6-994b-708b4644c30f
 
+## Componență echipă
+
+[Dogăreci Bianca Alexandra](https://github.com/BiancaDogareci)
+
+[Potlog Ioana](https://github.com/ioanapotlog)
 
 ## Definirea obiectivului
 
@@ -148,6 +153,8 @@ dotnet test
     - Re-run, debug sau filtrare a testelor.
 
 ### Rularea Testelor Demo:
+
+https://github.com/user-attachments/assets/d7559d29-8864-4700-b563-0feb710ec193
 
 ## Strategii de testare - Teorie + Exemple
 
