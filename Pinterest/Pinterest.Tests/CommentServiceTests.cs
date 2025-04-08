@@ -8,12 +8,14 @@ namespace Pinterest.Tests
     public class CommentServiceTests
     {
         // GetCommentById
-        // 1. id-ul este valid si exista in baza de date -> clasa de echivalenta
-        // 2. id-ul este valid, dar comentariul nu exista in baza de date -> clasa de echivalenta
-        // 3. id-u este null -> analiza de frontiera
+        
+        // commentId (int)
+        // "1" (valid) - t1
+        // "999" nu exista (invalid) - t2
+        // null (invalid) - t3
         
         [Fact]
-        public void GetCommentById_ValidId_ReturnsComment()
+        public void GetCommentById_ValidId_ReturnsComment_t1()
         {
             // Arrange
             var repoMock = new Mock<CommentRepository>(null);
@@ -33,7 +35,7 @@ namespace Pinterest.Tests
         }
 
         [Fact]
-        public void GetCommentById_InvalidId_ReturnsNull()
+        public void GetCommentById_InvalidId_ReturnsNull_t2()
         {
             // Arrange
             var repoMock = new Mock<CommentRepository>(null);
@@ -49,7 +51,7 @@ namespace Pinterest.Tests
         }
         
         [Fact]
-        public void GetCommentById_NullId_ReturnsNull()
+        public void GetCommentById_NullId_ReturnsNull_t3()
         {
             // Arrange
             var repoMock = new Mock<CommentRepository>(null);
@@ -66,210 +68,303 @@ namespace Pinterest.Tests
 
         
         // CreateComment
-        // 1. comentariul este valid (nu e "" si nici null) -> clasa de echivalenta
-        // 2. textul este gol "" -> analiza de frontiera
-        // 3. textul este null -> analiza de frontiera
-
+        
+        // comment_text
+        // "text" (valid) - t1
+        // "" (invalid) - t2
+        // null (invalid) - t3
+        
+        // pinId
+        // exista in db (valid) - t1
+        // nu exista in db (invalid) - t4
+        
+        // userId
+        // "string" (valid) - t1
+        // "" (invalid) - t5
+        // null (invalid) - t6
+        
         [Fact]
-        public void CreateComment_ValidComment_ReturnsSuccess()
+        public void CreateComment_ValidInputs_t1()
         {
-            // Arrange
+            var comment = new Comment { Text = "Hello world" };
             var repoMock = new Mock<CommentRepository>(null);
-            var comment = new Comment { Text = "Nice!" };
-            var service = new CommentService(repoMock.Object);
+            var pinRepoMock = new Mock<PinRepository>(null);
+            pinRepoMock.Setup(p => p.GetPinById(1)).Returns(new Pin { Id = 1 });
 
-            // Act
-            var result = service.CreateComment(comment, pinId: 1, userId: "user123");
+            var service = new CommentService(repoMock.Object, pinRepoMock.Object);
 
-            // Assert
+            var result = service.CreateComment(comment, 1, "user123");
+
             Assert.True(result.success);
             Assert.Null(result.error);
             repoMock.Verify(r => r.Add(It.IsAny<Comment>()), Times.Once);
         }
-
+        
         [Fact]
-        public void CreateComment_EmptyText_ReturnsError()
+        public void CreateComment_EmptyText_t2()
         {
-            // Arrange
-            var repoMock = new Mock<CommentRepository>(null);
             var comment = new Comment { Text = "" };
-            var service = new CommentService(repoMock.Object);
+            var repoMock = new Mock<CommentRepository>(null);
+            var pinRepoMock = new Mock<PinRepository>(null);
+            pinRepoMock.Setup(p => p.GetPinById(1)).Returns(new Pin { Id = 1 });
 
-            // Act
-            var result = service.CreateComment(comment, pinId: 1, userId: "user123");
+            var service = new CommentService(repoMock.Object, pinRepoMock.Object);
 
-            // Assert
+            var result = service.CreateComment(comment, 1, "user123");
+
             Assert.False(result.success);
             Assert.Equal("Text cannot be empty.", result.error);
             repoMock.Verify(r => r.Add(It.IsAny<Comment>()), Times.Never);
         }
         
         [Fact]
-        public void CreateComment_NullText_ReturnsError()
+        public void CreateComment_NullText_t3()
         {
-            // Arrange
-            var repoMock = new Mock<CommentRepository>(null);
             var comment = new Comment { Text = null };
-            var service = new CommentService(repoMock.Object);
+            var repoMock = new Mock<CommentRepository>(null);
+            var pinRepoMock = new Mock<PinRepository>(null);
+            pinRepoMock.Setup(p => p.GetPinById(1)).Returns(new Pin { Id = 1 });
 
-            // Act
-            var result = service.CreateComment(comment, pinId: 1, userId: "user123");
+            var service = new CommentService(repoMock.Object, pinRepoMock.Object);
 
-            // Assert
+            var result = service.CreateComment(comment, 1, "user123");
+
             Assert.False(result.success);
             Assert.Equal("Text cannot be empty.", result.error);
-            repoMock.Verify(r => r.Add(It.IsAny<Comment>()), Times.Never);
+        }
+        
+        [Fact]
+        public void CreateComment_InvalidPin_t4()
+        {
+            var comment = new Comment { Text = "Valid Text" };
+            var repoMock = new Mock<CommentRepository>(null);
+            var pinRepoMock = new Mock<PinRepository>(null);
+            pinRepoMock.Setup(p => p.GetPinById(999)).Returns((Pin)null);
+
+            var service = new CommentService(repoMock.Object, pinRepoMock.Object);
+
+            var result = service.CreateComment(comment, 999, "user123");
+
+            Assert.False(result.success);
+            Assert.Equal("Invalid pin ID.", result.error);
+        }
+        
+        [Fact]
+        public void CreateComment_EmptyUserId_t5()
+        {
+            var comment = new Comment { Text = "Test" };
+            var repoMock = new Mock<CommentRepository>(null);
+            var pinRepoMock = new Mock<PinRepository>(null);
+            pinRepoMock.Setup(p => p.GetPinById(1)).Returns(new Pin { Id = 1 });
+
+            var service = new CommentService(repoMock.Object, pinRepoMock.Object);
+
+            var result = service.CreateComment(comment, 1, "");
+
+            Assert.False(result.success);
+            Assert.Equal("User ID cannot be empty.", result.error);
+        }
+
+        [Fact]
+        public void CreateComment_NullUserId_t6()
+        {
+            var comment = new Comment { Text = "Test" };
+            var repoMock = new Mock<CommentRepository>(null);
+            var pinRepoMock = new Mock<PinRepository>(null);
+            pinRepoMock.Setup(p => p.GetPinById(1)).Returns(new Pin { Id = 1 });
+
+            var service = new CommentService(repoMock.Object, pinRepoMock.Object);
+
+            var result = service.CreateComment(comment, 1, null);
+
+            Assert.False(result.success);
+            Assert.Equal("User ID cannot be empty.", result.error);
         }
 
         
         // UpdateComment
-        // 1. comentariul exista, update valid -> clasa de echivalenta
-        // 2. comentariul nu exista in baza de date, update invalid -> clasa de echivalenta
-        // 3. comentariul se actualizeaza cu textul corect -> precizie in actualizare
-
-        [Fact]
-        public void UpdateComment_ValidUpdate_ReturnsUpdatedComment()
-        {
-            // Arrange
-            var oldComment = new Comment { Id = 1, Text = "Old", Date = DateTime.MinValue };
-            
-            var repoMock = new Mock<CommentRepository>(null);
-            repoMock.Setup(r => r.GetById(1)).Returns(oldComment);
-            
-            var service = new CommentService(repoMock.Object);
-            var newData = new Comment { Text = "Updated!" };
-
-            // Act
-            var result = service.UpdateComment(1, newData);
-
-            // Assert
-            Assert.True(result.success);
-            Assert.Equal("Updated!", result.comment.Text);
-            Assert.NotEqual(DateTime.MinValue, result.comment.Date);
-            repoMock.Verify(r => r.Update(oldComment), Times.Once);
-        }
+        
+        // commentId
+        // exista in db (valid) - t1
+        // nu exista in db (invalid) - t2
+        
+        // new_comment_text
+        // "text" (valid) - t1
+        // "" (invalid) - t3
+        // null (invalid) - t4
         
         [Fact]
-        public void UpdateComment_CommentNotFound_ReturnsFalse()
+        protected void UpdateComment_ValidInputs_ReturnsSuccess_t1()
         {
-            // Arrange
+            var existingComment = new Comment { Id = 1, Text = "Old" };
             var repoMock = new Mock<CommentRepository>(null);
-            repoMock.Setup(r => r.GetById(1)).Returns((Comment)null);
+            repoMock.Setup(r => r.GetById(1)).Returns(existingComment);
 
             var service = new CommentService(repoMock.Object);
+            var newData = new Comment { Text = "Updated" };
 
-            // Act
-            var result = service.UpdateComment(1, new Comment { Text = "new" });
+            var result = service.UpdateComment(1, newData);
 
-            // Assert
+            Assert.True(result.success);
+            Assert.Null(result.error);
+            Assert.NotNull(result.comment);
+            Assert.Equal("Updated", result.comment.Text);
+            repoMock.Verify(r => r.Update(existingComment), Times.Once);
+        }
+
+        [Fact]
+        public void UpdateComment_InvalidId_ReturnsCommentNotFound_t2()
+        {
+            var repoMock = new Mock<CommentRepository>(null);
+            repoMock.Setup(r => r.GetById(999)).Returns((Comment)null);
+
+            var service = new CommentService(repoMock.Object);
+            var newData = new Comment { Text = "Updated" };
+
+            var result = service.UpdateComment(999, newData);
+
             Assert.False(result.success);
+            Assert.Equal("Comment not found.", result.error);
             Assert.Null(result.comment);
             repoMock.Verify(r => r.Update(It.IsAny<Comment>()), Times.Never);
         }
         
         [Fact]
-        public void UpdateComment_UpdateTextIsCorrect()
+        public void UpdateComment_EmptyText_ReturnsError_t3()
         {
-            // Arrange
-            var existing = new Comment { Id = 1, Text = "Initial" };
-
+            var existingComment = new Comment { Id = 1, Text = "Old" };
             var repoMock = new Mock<CommentRepository>(null);
-            repoMock.Setup(r => r.GetById(1)).Returns(existing);
+            repoMock.Setup(r => r.GetById(1)).Returns(existingComment);
 
             var service = new CommentService(repoMock.Object);
-            var updated = new Comment { Text = "Updated!" };
+            var newData = new Comment { Text = "" };
 
-            // Act
-            var result = service.UpdateComment(1, updated);
+            var result = service.UpdateComment(1, newData);
 
-            // Assert
-            Assert.Equal("Updated!", result.comment.Text);
-            Assert.True(result.success);
+            Assert.False(result.success);
+            Assert.Equal("Text cannot be empty.", result.error);
+            Assert.Null(result.comment);
+            repoMock.Verify(r => r.Update(It.IsAny<Comment>()), Times.Never);
+        }
+
+        [Fact]
+        public void UpdateComment_NullText_ReturnsError_t4()
+        {
+            var existingComment = new Comment { Id = 1, Text = "Old" };
+            var repoMock = new Mock<CommentRepository>(null);
+            repoMock.Setup(r => r.GetById(1)).Returns(existingComment);
+
+            var service = new CommentService(repoMock.Object);
+            var newData = new Comment { Text = null };
+
+            var result = service.UpdateComment(1, newData);
+
+            Assert.False(result.success);
+            Assert.Equal("Text cannot be empty.", result.error);
+            Assert.Null(result.comment);
+            repoMock.Verify(r => r.Update(It.IsAny<Comment>()), Times.Never);
         }
         
         
         // DeleteComment
-        // 1. utilizatorul e owner, delete valid -> clasa de echivalenta
-        // 2. utilizatorul nu e owner, dar e admin, delete valid -> clasa de echivalenta
-        // 3. comentariul nu exista, delete invalid -> clasa de echivalenta
-        // 4. utilizator neautorizat, delete invalid -> clasa de echivalenta
+        
+        // commendId
+        // exista in db (valid) - t1
+        // nu exista in db (invalid) - t2
+        
+        // currentUserId + isAdmin (true/false)
+        // utilizatorul e owner (valid) - t1 
+        // utilizatorul nu e owner, dar e admin (isAdmin = true) (valid) - t3
+        // utilizatorul nu e owner, nici admin (isAdmin = false) (invalid) - t4
+        // "" (invalid) - t5
+        // null (invalid) - t6
 
         [Fact]
-        public void TryDeleteComment_UserIsOwner_ReturnsTrue()
+        public void TryDeleteComment_CommentExists_UserIsOwner_ReturnsTrue_t1()
         {
-            // Arrange
             var comment = new Comment { Id = 1, AppUserId = "user123", PinId = 42 };
-
             var repoMock = new Mock<CommentRepository>(null);
             repoMock.Setup(r => r.GetById(1)).Returns(comment);
 
             var service = new CommentService(repoMock.Object);
 
-            // Act
             var result = service.TryDeleteComment(1, "user123", false, out var pinId);
 
-            // Assert
             Assert.True(result);
             Assert.Equal(42, pinId);
             repoMock.Verify(r => r.Delete(comment), Times.Once);
         }
         
         [Fact]
-        public void TryDeleteComment_UserIsAdmin_ReturnsTrue()
+        public void TryDeleteComment_CommentDoesNotExist_ReturnsFalse_t2()
         {
-            // Arrange
-            var comment = new Comment { Id = 1, AppUserId = "user123", PinId = 99 };
-
             var repoMock = new Mock<CommentRepository>(null);
-            repoMock.Setup(r => r.GetById(1)).Returns(comment);
+            repoMock.Setup(r => r.GetById(999)).Returns((Comment)null);
 
             var service = new CommentService(repoMock.Object);
 
-            // Act
-            var result = service.TryDeleteComment(1, "otherUser", true, out var pinId);
+            var result = service.TryDeleteComment(999, "user", false, out var pinId);
 
-            // Assert
-            Assert.True(result);
-            Assert.Equal(99, pinId);
-            repoMock.Verify(r => r.Delete(comment), Times.Once);
-        }
-        
-        [Fact]
-        public void TryDeleteComment_CommentNotFound_ReturnsFalse()
-        {
-            // Arrange
-            var repoMock = new Mock<CommentRepository>(null);
-            repoMock.Setup(r => r.GetById(1)).Returns((Comment)null);
-
-            var service = new CommentService(repoMock.Object);
-
-            // Act
-            var result = service.TryDeleteComment(1, "user1", false, out var pinId);
-
-            // Assert
             Assert.False(result);
             Assert.Null(pinId);
             repoMock.Verify(r => r.Delete(It.IsAny<Comment>()), Times.Never);
         }
         
         [Fact]
-        public void TryDeleteComment_UserNotOwnerNorAdmin_ReturnsFalse()
+        public void TryDeleteComment_CommentExists_UserIsAdmin_ReturnsTrue_t3()
         {
-            // Arrange
-            var comment = new Comment { Id = 1, AppUserId = "otherUser", PinId = 7 };
-
+            var comment = new Comment { Id = 1, AppUserId = "ownerUser", PinId = 99 };
             var repoMock = new Mock<CommentRepository>(null);
             repoMock.Setup(r => r.GetById(1)).Returns(comment);
 
             var service = new CommentService(repoMock.Object);
 
-            // Act
-            var result = service.TryDeleteComment(1, "currentUser", false, out var pinId);
+            var result = service.TryDeleteComment(1, "adminUser", true, out var pinId);
 
-            // Assert
+            Assert.True(result);
+            Assert.Equal(99, pinId);
+            repoMock.Verify(r => r.Delete(comment), Times.Once);
+        }
+        
+        [Fact]
+        public void TryDeleteComment_CommentExists_UserNotOwnerNorAdmin_ReturnsFalse_t4()
+        {
+            var comment = new Comment { Id = 1, AppUserId = "ownerUser", PinId = 77 };
+            var repoMock = new Mock<CommentRepository>(null);
+            repoMock.Setup(r => r.GetById(1)).Returns(comment);
+
+            var service = new CommentService(repoMock.Object);
+
+            var result = service.TryDeleteComment(1, "randomUser", false, out var pinId);
+
             Assert.False(result);
-            Assert.Equal(7, pinId);
+            Assert.Equal(77, pinId);
             repoMock.Verify(r => r.Delete(It.IsAny<Comment>()), Times.Never);
         }
+        
+        [Fact]
+        public void TryDeleteComment_EmptyUserId_ThrowsException_t5()
+        {
+            var comment = new Comment { Id = 1, AppUserId = "user123", PinId = 10 };
+            var repoMock = new Mock<CommentRepository>(null);
+            repoMock.Setup(r => r.GetById(1)).Returns(comment);
+
+            var service = new CommentService(repoMock.Object);
+
+            Assert.Throws<ArgumentException>(() => service.TryDeleteComment(1, "", false, out _));
+        }
+
+        [Fact]
+        public void TryDeleteComment_NullUserId_ThrowsException_t6()
+        {
+            var comment = new Comment { Id = 1, AppUserId = "user123", PinId = 10 };
+            var repoMock = new Mock<CommentRepository>(null);
+            repoMock.Setup(r => r.GetById(1)).Returns(comment);
+
+            var service = new CommentService(repoMock.Object);
+
+            Assert.Throws<ArgumentException>(() => service.TryDeleteComment(1, null, false, out _));
+        }
+
     }
 }

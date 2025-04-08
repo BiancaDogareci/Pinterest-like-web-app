@@ -22,7 +22,8 @@ public class CommentsController : Controller
         _roleManager = roleManager;
 
         var commentRepo = new CommentRepository(context);
-        _commentService = new CommentService(commentRepo);
+        var pinRepo = new PinRepository(context);
+        _commentService = new CommentService(commentRepo, pinRepo);
     }
 
     [HttpGet]
