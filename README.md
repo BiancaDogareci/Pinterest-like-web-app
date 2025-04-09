@@ -341,10 +341,10 @@ Similar pentru ```string.IsNullOrWhiteSpace(search)```.
 ### g) Testarea circuitelor independente + Complexitate ciclomatică (McCabe)
 
 Formulă: V(G) = E - N + 2
-- Noduri: 8;
-- Muchii: 10;
+- Noduri: 13;
+- Muchii: 14;
 
-V(G) = 10 - 8 + 2 = 4
+V(G) = 14 - 13 + 2 = 3
 
 Avem 3 circuite independente:
 - ```perPage``` invalid;
