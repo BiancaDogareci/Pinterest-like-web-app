@@ -179,11 +179,11 @@ Exista 3 intrări:
 - un întreg ```page```;
 - un întreg ```perPage```;
 - ```search``` poate să fie null, gol sau un text, toate fiind valide, deci nu determină clase de echivalență suplimentare;
-<br>
+
 S_1 = { null, "", "text" }
 
 - ```page``` trebuie să fie >= 1 și <= n, deci se disting 3 clase de echivalență:
-<br>
+
 P_1 = 1...n
 <br>
 P_2 = {page | page < 1}
@@ -191,7 +191,7 @@ P_2 = {page | page < 1}
 P_3 = {page | page > n}
 
 - ```perPage``` trebuie să fie >= 1, deci se disting 2 clase de echivalență:
-<br>
+
 PP_1 = {perPage | perPage < 1}
 <br>
 PP_2 = {perPage | perPage >= 1}
@@ -296,7 +296,6 @@ Pentru exemplul nostru:
 1. Descompune specificatia în unități: funcția GetPins() reprezintă o singură unitate.
 2. Identifică parametrii: search, page, perPage.
 3. Găsește categorii:
-<br>
 - search: orice valoare validă (null, "", "text");
 <br>
 - page: dacă este în intervalul valid 1...n;
@@ -304,41 +303,25 @@ Pentru exemplul nostru:
 - perPage: dacă este validă, adică >= 1;
 
 4. Partiționeaza fiecare categorie în alternative:
-<br>
 - page: < 0, 0, 1, 2..n-1, n, n+1, > n+1;
 <br>
 - perPage: < 0, 0, 1, > 1;
 
 5. Scrie specificația de testare
-<br>
 - search:
-<br>
   1) search = null || "" || "text" [ok]
-<br>
 - page: 
-<br>
   1) {page | page < 0}
-  <br>
   2) 0
-  <br>
   3) 1  [if ok and minim_valid]
-  <br>
   4) 2...n-1 [if ok and pagină_intermediară]
-  <br>
   5) n  [if ok and maxim_valid]
-  <br>
   6) n+1
-  <br>
   7) {page | page > n+1}
-<br>
 - perPage: 
-<br>
   1) {perPage | perPage < 0}
-  <br>
   2) 0
-  <br>
   3) 1 [if ok and minim_valid]
-  <br>
   4) {perPage | perPage > 1} [if ok and valid_extins]
 
 Din specificația de testare ar trebui să rezulte 1 x 7 x 4 = 28 de cazuri de testare. Pe de altă
@@ -349,11 +332,9 @@ Aplicând aceste constrângeri și eliminând combinațiile invalide sau redunda
 
 6. Creează cazuri de testare
 
-s1p1      s1p2      s1pp1     s1pp2 
-s1p3pp3   s1p3pp4   s1p4pp3   s1p4pp4 
-s1p5pp3   s1p5pp4   s1p6      s1p7
+s1p1&nbsp;&nbsp;&nbsp;&nbsp;s1p2&nbsp;&nbsp;&nbsp;&nbsp;s1pp1&nbsp;&nbsp;&nbsp;&nbsp;s1pp2&nbsp;&nbsp;&nbsp;&nbsp;s1p3pp3&nbsp;&nbsp;&nbsp;&nbsp;s1p3pp4&nbsp;&nbsp;&nbsp;&nbsp;s1p4pp3&nbsp;&nbsp;&nbsp;&nbsp;s1p4pp4&nbsp;&nbsp;&nbsp;&nbsp;s1p5pp3&nbsp;&nbsp;&nbsp;&nbsp;s1p5pp4&nbsp;&nbsp;&nbsp;&nbsp;s1p6&nbsp;&nbsp;&nbsp;&nbsp;s1p7
 
-7. Creează date de test
+1. Creează date de test
 
 | ID         | search      | page | perPage | Rezultat așteptat (expected)            |
 |------------|-------------|------|---------|-----------------------------------------|
@@ -422,56 +403,71 @@ public (IEnumerable<Pin> Pins, int LastPage, string PaginationUrl) GetPins(strin
 
 ### a) Acoperire la nivel de instrucțiune (Statement coverage)
 
-| Test | Input                                      | Descriere                                 |
-|------|--------------------------------------------|--------------------------------------------|
-| TC1  | `search = null, page = 1, perPage = 2`     | Ramura normală fără search                |
-| TC2  | `search = "tag", page = 1, perPage = 2`    | Ramura normală cu search                  |
-| TC3  | `search = null, page = 0, perPage = 2`     | `page <= 0 → return empty`                |
-| TC4  | `search = null, page = 1, perPage = 0`     | `perPage <= 0 → return empty`             |
+Pentru a obține o acoperire la nivel de instrucțiune, trebuie să ne concentram asupra acelor
+instrucțiuni care sunt controlate de condiții (acestea corespund ramificațiilor din graf)
+
+| **Intrări**                                 | **Rezultat așteptat**                              | **Instrucțiuni parcurse**       |
+|---------------------------------------------|----------------------------------------------------|---------------------------------|
+| `search = ""`, `page = 0`, `perPage = 2`    | Listă goală, LastPage = 0, URL                     | 1, 2, 4, 5, 6, 7, 8             |
+| `search = "tag"`, `page = 1`, `perPage = 2` | Listă filtrată, LastPage != 0, URL cu search       | 1, 3, 4, 5, 6, 9, 10, 11, 12    |
 
 
-### b) Acoperire pe ramuri (Branch coverage)
-#### Ramuri:
-- ```if (perPage <= 0 || page <= 0)``` → true și false
-- ```if (string.IsNullOrWhiteSpace(search))``` → true și false
+### b) Acoperire la nivel de decizie (Decision coverange)
+- Este o extindere naturală a metodei precedente.
+- Genereaza date de test care testează cazurile când fiecare decizie este adevărată sau falsă.
+
+|     | **Decizii**                                        |
+|-----|----------------------------------------------------|
+| (1) | if (string.IsNullOrWhiteSpace(search))             |
+| (2) | if (perPage <= 0 or page <= 0  or page > lastPage) |
+| (3) | if (string.IsNullOrWhiteSpace(search))             |
+
+
+| search     | page | perPage | **Rezultat așteptat**                          | **Decizii acoperite**                 |
+|------------|------|---------|------------------------------------------------|---------------------------------------|
+| ""         | 0    | 2       | listă goală, LastPage = 0, URL                 | (1) = true, (2) = true                |
+| "test"     | 1    | 0       | listă goală, LastPage = 0, URL cu search       | (1) = false, (2) = true               |
+| "test"     | 1    | 2       | pin-uri paginate, LastPage != 0, URL cu search | (1) = false, (2) = false, (3) = false |
+| null       | 1    | 2       | pin-uri paginate, LastPage != 0, URL           | (1) = true, (2) = false, (3) = true   |
+
 
 ### c) Acoperire pe condiții (Condition coverage)
+- Genereaza date de test astfel încat fiecare condiție individuală dintr-o decizie să ia atât valoarea adevărat cât și valoarea fals (dacă acest lucru este posibil).
 
-Pentru ```if (perPage <= 0 || page <= 0)```, sunt două condiții:
-- ```perPage <= 0```;
-- ```page <= 0```;
+|     | **Decizii**                                         | **Condiții individuale**                           |
+|-----|-----------------------------------------------------|----------------------------------------------------|
+| (1) | if (string.IsNullOrWhiteSpace(search))              | search = {null, ""}                                |
+| (2) | if (perPage <= 0 or page <= 0  or page > lastPage)  | (perPage <= 0) (page <= 0) (page > lastPage)       |
+| (3) | if (string.IsNullOrWhiteSpace(search))              | search = {null, ""}                                |
 
-Trebuie:
-- ```perPage = 0```, ```page = 1``` → true
-- ```perPage = 1```, ```page = 0``` → true
-- ```perPage = 1```, ```page = 1``` → false
 
-Pentru string.IsNullOrWhiteSpace(search):
-- ```search = null``` → true
-- ```search = ""``` → true
-- ```search = "abc"``` → false
+| search     | page | perPage | Rezultat afișat                                            | Condiții individuale acoperite                                                                |
+|------------|------|---------|------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| "text"     | 0    | 2       | Returnează listă goală + LastPage = 0 + URL cu search      | search != "", search != null, page <= 0 (true), perPage <= 0 (false), page > lastPage (false) |
+| ""         | 0    | 2       | Returnează listă goală + LastPage = 0 + URL                | search = "", page <= 0 (true), perPage <= 0 (false), page > lastPage (false)                  |
+| "test"     | 1    | 0       | Returnează listă goală + LastPage = 0 + URL cu search      | search != "", search != null, page <= 0 (false), perPage <= 0 (true), page > lastPage (false) |
+| null       | 1    | 0       | Returnează listă goală + LastPage = 0 + URL                | search = null, page <= 0 (false), perPage <= 0 (true), page > lastPage (false)                |
+| "test"     | 6    | 2       | Returnează listă goală + LastPage = 0 + URL cu search      | search != "", search != null, page <= 0 (false), perPage <= 0 (false) page > lastPage (true)  |
+| ""         | 6    | 2       | Returnează listă goală + LastPage = 0 + URL                | search = "", page <= 0 (false), perPage <= 0 (false) page > lastPage (true)                   |
+| null       | 1    | 2       | Returnează pinuri paginate + LastPage + URL                | search = null, page <= 0 (false), perPage <= 0 (false) page > lastPage (false)                |
+| "test"     | 1    | 2       | Returnează pinuri paginate + LastPage + URL cu search      | search != "", search != null, page <= 0 (false), perPage <= 0 (false) page > lastPage (false) |
 
-### d) Acoperire la nivel de condiție/decizie (Condition/Decision Coverage - C/DC)
-Fiecare condiție și decizie acoperită:
-- TC1: ```search = null```, valid ```page/perPage``` -> true
-- TC2: ```search = “tag"``` -> true
-- TC3: ```page = 0``` -> false
-- TC4: ```perPage = 0``` -> false
-- TC5: ```search = ""``` (string goală) -> true
 
-### g) Testarea circuitelor independente + Complexitate ciclomatică (McCabe)
+### d) Testarea circuitelor independente + Complexitate ciclomatică (McCabe)
+- Acesta este o modalitate de a identifica limita superioară pentru numărul de căi necesare pentru obținerea unei acoperiri la nivel de ramură.
+- Se bazează pe formula lui McCabe pentru Complexitate Ciclomatică. Dat fiind un graf complet conectat G cu e arce și n noduri, atunci numărul de circuite linear independente este dat de: V(G) = E – N + 1.
+- Formula simplificată: V(G) = E − N + 2.
 
-Formulă: V(G) = E - N + 2
-- Noduri: 13;
-- Muchii: 14;
+- Noduri: 11;
+- Muchii: 11;
 
-V(G) = 14 - 13 + 2 = 3
+V(G) = 11 - 11 + 2 = 2
 
-Avem 3 circuite independente:
-- ```perPage``` invalid;
-- ```page``` invalid;
-- ```search``` valid + paginare validă;
+Avem 2 circuite independente:
 
+a) 1, 2, 4, 5, 6, 7, 8 (Aceasta este ramura pentru ```search == null``` sau ```search == ""``` și returnare devreme);
+
+b) 1, 3, 4, 5, 6, 9, 10, 11, 12 (Aceasta este ramura pentru ```search != null``` și ```search != ""``` și continuarea execuției complete, cu paginare);
 
 ## Raport despre folosirea unui tool AI (ChatGPT)
 
