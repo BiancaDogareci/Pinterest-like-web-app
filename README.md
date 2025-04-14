@@ -296,33 +296,28 @@ Pentru exemplul nostru:
 1. Descompune specificatia în unități: funcția GetPins() reprezintă o singură unitate.
 2. Identifică parametrii: search, page, perPage.
 3. Găsește categorii:
-- search: orice valoare validă (null, "", "text");
-<br>
-- page: dacă este în intervalul valid 1...n;
-<br>
-- perPage: dacă este validă, adică >= 1;
-
+  - search: orice valoare validă (null, "", "text");
+  - page: dacă este în intervalul valid 1...n;
+  - perPage: dacă este validă, adică >= 1;
 4. Partiționeaza fiecare categorie în alternative:
-- page: < 0, 0, 1, 2..n-1, n, n+1, > n+1;
-<br>
-- perPage: < 0, 0, 1, > 1;
-
+  - page: < 0, 0, 1, 2..n-1, n, n+1, > n+1;
+  - perPage: < 0, 0, 1, > 1;
 5. Scrie specificația de testare
-- search:
-  1) search = null || "" || "text" [ok]
-- page: 
-  1) {page | page < 0}
-  2) 0
-  3) 1  [if ok and minim_valid]
-  4) 2...n-1 [if ok and pagină_intermediară]
-  5) n  [if ok and maxim_valid]
-  6) n+1
-  7) {page | page > n+1}
-- perPage: 
-  1) {perPage | perPage < 0}
-  2) 0
-  3) 1 [if ok and minim_valid]
-  4) {perPage | perPage > 1} [if ok and valid_extins]
+  - search:
+    1) search = null || "" || "text" [ok]
+  - page: 
+    1) {page | page < 0}
+    2) 0
+    3) 1  [if ok and minim_valid]
+    4) 2...n-1 [if ok and pagină_intermediară]
+    5) n  [if ok and maxim_valid]
+    6) n+1
+    7) {page | page > n+1}
+  - perPage: 
+    1) {perPage | perPage < 0}
+    2) 0
+    3) 1 [if ok and minim_valid]
+    4) {perPage | perPage > 1} [if ok and valid_extins]
 
 Din specificația de testare ar trebui să rezulte 1 x 7 x 4 = 28 de cazuri de testare. Pe de altă
 parte, unele combinații de alternative nu au sens și pot fi eliminate. Acest lucru se poate face
