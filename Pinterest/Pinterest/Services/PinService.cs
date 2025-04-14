@@ -25,8 +25,9 @@ namespace Pinterest.Services
                 : _repo.GetPinsBySearch(search);
 
             int totalItems = pins.Count();
+            int lastPage = (int)Math.Ceiling((float)totalItems / perPage);
 
-            if (perPage <= 0 || page <= 0)
+            if (perPage <= 0 || page <= 0 || page > lastPage)
             {
                 return (new List<Pin>(), 0, string.IsNullOrWhiteSpace(search)
                     ? "/Pins/Index/?page"
@@ -36,7 +37,6 @@ namespace Pinterest.Services
             int offset = (page - 1) * perPage;
 
             var paginatedPins = pins.Skip(offset).Take(perPage).ToList();
-            int lastPage = (int)Math.Ceiling((float)totalItems / perPage);
             string url = string.IsNullOrWhiteSpace(search)
                 ? "/Pins/Index/?page"
                 : $"/Pins/Index/?search={search}&page";

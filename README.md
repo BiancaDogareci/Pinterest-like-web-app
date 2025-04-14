@@ -158,78 +158,217 @@ https://github.com/user-attachments/assets/d7559d29-8864-4700-b563-0feb710ec193
 
 ## Strategii de testare - Teorie + Exemple
 
-Funcția GetPins(string search, int page, int perPage) - returnează o listă paginată de pin-uri, filtrată opțional după search, ordonată descrescător după LikesCount.
-
 ### 1. Testare funcțională
+
+### Exemplu:
+
+Se testează funcția GetPins(string search, int page, int perPage), care returnează o listă paginată de pin-uri, filtrată opțional după un cuvânt cheie (search) și ordonată descrescător după LikesCount. Mai precis, pentru un search (care poate fi null, gol sau un text), o valoare întreagă page >= 1 și <= n (ceil(nr pins / perPage)) și un perPage >= 1, funcția caută pin-urile corespunzătoare și le ordonează descrescător după numărul de aprecieri (LikesCount). În cazul în care search este specificat, sunt afișate pin-urile care conțin respectivul cuvânt în titlu, descriere sau comentarii. Funcția returnează doar pin-urile corespunzătoare paginii cerute, împreună cu numărul ultimei pagini (LastPage) și un URL construit pentru navigare (PaginationUrl). Funcția verifică dacă valorile pentru page (< 1 sau > n) sau perPage (< 1) sunt invalide, iar dacă cel puțin una este invalidă, aceasta nu execută căutarea și returnează o listă goală cu LastPage egal cu 0 și un URL construit în funcție de search. Funcția este apelată de fiecare dată când utilizatorul caută un cuvânt nou sau navighează la o pagină diferită.
+
+Pentru exemplul nostru avem:
+- avem ```m``` pin-uri în total;
+- folosim ```perPage``` pentru a decide câte pin-uri apar pe o pagină;
+- numărul total de pagini este ```n = ceil(m / perPage)```;
 
 ### a) Partiționare de echivalență
 Ideea de bază este de a partiționa domeniul problemei (datele de intrare) în clase de echivalență astfel încât, din punctul de vedere al specificației datele dintr-o clasă sunt tratate în mod identic.
 
-| Parametru |   Clasă validă   | Clasă invalidă |
-|-----------|------------------|----------------|
-| search    | "", "text", null |       X        |
-| page      |       > 0        |      <= 0      |
-| perPage   |       > 0        |      <= 0      |
+### Domeniul de intrări:
+
+Exista 3 intrări:
+- un string ```search```;
+- un întreg ```page```;
+- un întreg ```perPage```;
+- ```search``` poate să fie null, gol sau un text, toate fiind valide, deci nu determină clase de echivalență suplimentare;
+<br>
+S_1 = { null, "", "text" }
+
+- ```page``` trebuie să fie >= 1 și <= n, deci se disting 3 clase de echivalență:
+<br>
+P_1 = 1...n
+<br>
+P_2 = {page | page < 1}
+<br>
+P_3 = {page | page > n}
+
+- ```perPage``` trebuie să fie >= 1, deci se disting 2 clase de echivalență:
+<br>
+PP_1 = {perPage | perPage < 1}
+<br>
+PP_2 = {perPage | perPage >= 1}
+
+### Domeniul de ieșiri:
+
+Funcția returnează un tuplu cu următoarele 3 componente:
+- o listă de pin-uri```Pins```afișate pentru pagina curentă;
+- un întreg pozitiv ```LastPage``` care reprezintă numărul ultimei pagini disponibile;
+- un string ```PaginationUrl``` care reprezintă adresa URL pentru navigarea între pagini.
+
+Constă în următoarele răspunsuri:
+- dacă parametrii page >= 1 și <= n și perPage >= 1, funcția returnează o listă de pinuri corespunzătoare paginii cerute, alături de numărul ultimei pagini și un URL de paginare;
+- dacă page (< 1 sau > n) sau perPage (< 1) este invalid, funcția returnează o listă goală, LastPage egal cu 0 și un URL de paginare;
+
+Acestea sunt folosite pentru a împărți domeniul de intrare în 2 clase: una pentru cazul în care page și perPage sunt >= 1 și page <= n și una pentru cazul în care page sau perPage este invalid (< 1 sau page > n):
+<br>
+C_1(page, perPage) = {l, lp, url | page >= 1 și perPage >= 1 și page <= n};
+<br>
+C_2(page, perPage) = {[], 0, url | page < 1 sau perPage < 1 sau page > n};
+
+Clasele de echivalență pentru întregul program (globale) se pot obține ca o combinatie a claselor individuale:
+<br>
+C_111 = {(search, page, perPage) | search ∈ S_1, page ∈ P_1, perPage ∈ PP_1}
+<br>
+C_112 = {(search, page, perPage) | search ∈ S_1, page ∈ P_1, perPage ∈ PP_2}
+<br>
+C_121 = {(search, page, perPage) | search ∈ S_1, page ∈ P_2, perPage ∈ PP_1}
+<br>
+C_122 = {(search, page, perPage) | search ∈ S_1, page ∈ P_2, perPage ∈ PP_2}
+<br>
+C_132 = {(search, page, perPage) | search ∈ S_1, page ∈ P_3, perPage ∈ PP_2}
+
+Setul de date de test se alcătuiește alegându-se o valoare a intrărilor pentru fiecare clasă de echivalență. De exemplu, pentru m = 10 și n = ceil(m / perPage):
+<br>
+c_111 = ("example", 2, -1)
+<br>
+c_112 = ("example", 3, 2)
+<br>
+c_121 = (null, 2, 0)
+<br>
+c_122 = ("", 0, 2)
+<br>
+c_132 = ("", 6, 3)
+5 clase
+
+| search     | page | perPage | Rezultat așteptat (expected)                    |
+|------------|------|---------|-------------------------------------------------|
+| "example"  | 2    | -1      | Returnează listă goală + LastPage = 0 + URL     |
+| "example"  | 3    | 2       | Returnează pin-urile paginate + LastPage + URL  |
+| null       | 2    | 0       | Returnează listă goală + LastPage = 0 + URL     |
+| ""         | 0    | 2       | Returnează listă goală + LastPage = 0 + URL     |
+| ""         | 6    | 3       | Returnează listă goală + LastPage = 0 + URL     |
 
 
 ### b) Analiza valorilor de frontieră
 Analiza valorilor de frontieră este folosită de obicei împreuna cu partiționarea de echivalență. Ea se concentrează pe examinarea valorilor de frontieră ale claselor, care de obicei sunt o sursă importanta de erori.
 
-Spre exemplu:
-- avem m pin-uri în total;
-- folosim ```perPage``` pentru a decide câte pin-uri apar pe o pagină;
-- numărul total de pagini este ```n = ceil(m / perPage)```;
+Odată ce au fost identificate clasele, valorile de frontieră sunt ușor de identificat:
+- valorile 0, 1, n, n+1 pentru ```page```;
+- valorile 0, 1 pentru ```perPage```;
 
-#### Parametrul "page":
+Deci se vor testa următoarele valori:
+<br>
+- P_1: 1, n
+<br>
+- P_2: 0
+<br>
+- P_3: n + 1
+<br>
+- PP_1: 0
+<br>
+- PP_2: 1
+<br> 
+- Pentru S_1 se ia câte o valoare arbitrară
 
-| Caz testat                         | Valoare   | Este valid? | Observație                                                                 |
-|-----------------------------------|-----------|-------------|----------------------------------------------------------------------------|
-| Valoare imediat sub limita minimă | `0`       | Nu          | Index invalid – paginile încep de la 1                                     |
-| Valoare minimă validă             | `1`       | Da          | Prima pagină                                                               |
-| Valoare maximă validă             | `n`       | Da          | Ultima pagină (ex: dacă m = 5 și perPage = 2, atunci n = 3)               |
-| Valoare imediat peste maxim       | `n + 1`   | Nu          | Pagină inexistentă – nu ar trebui să returneze rezultate                   |
+C_111 = ("example", 1, 0)
+<br>
+C_112 = ("example", 1, 1) ("example", 10, 1)
+<br>
+C_121 = (null, 1, 0)
+<br>
+C_122 = ("", 0, 1)
+<br>
+C_132 = ("", 11, 1)
 
-
-#### Parametrul "perPage":
-
-| Caz testat        | Valoare | Este valid? | Observație                                             |
-|-------------------|---------|-------------|--------------------------------------------------------|
-| Valoare negativă  | < 0     | Nu          | Nu se pot cere pagini cu număr negativ de elemente     |
-| Valoare zero      | 0       | Nu          | Ar produce o diviziune la 0 sau rezultat gol           |
-| Valoare pozitivă  | > 0     | Da          | Comportament așteptat                                  |
-
+| search     | page | perPage | Rezultat așteptat (expected)                                           |
+|------------|------|---------|------------------------------------------------------------------------|
+| "example"  | 1    | 0       | perPage invalid, listă goală, LastPage = 0, URL                        |
+| "example"  | 1    | 1       | Returnează primele pinuri, LastPage calculat, URL valid                |
+| "example"  | 10   | 1       | Returnează ultimele pinuri, LastPage = 10, URL valid                   |
+| null       | 1    | 0       | perPage invalid, listă goală, LastPage = 0, URL                        |
+| ""         | 0    | 1       | page invalid, listă goală, LastPage = 0, URL                           |
+| ""         | 11   | 1       | page > LastPage, listă goală, LastPage = 0, URL                        |
 
 
 ### c) Partiționarea în categorii
 Această metodă se bazează pe cele două anterioare. Ea caută să genereze date de test care “acoperă" funcționalitatea sistemului și maximizeaza posibilitatea de găsire a erorilor.
 
-| Parametru | Categorie                     | Alternative (valori reprezentative)                                                                 |
-|-----------|-------------------------------|------------------------------------------------------------------------------------------------------|
-| `search`  | conținutul filtrului          | 1. gol (`""`) <br> 2. valid (e.g. `"test"`) <br> 3. nu există rezultate                              |
-| `page`    | validitatea paginii           | 1. `1` (minim valid) <br> 2. `n` (ultimul valid) <br> 3. `n+1` (invalid peste limită) <br> 4. `0`    |
-| `perPage` | validitatea numărului pe pagină | 1. `> 0` (valid) <br> 2. `= 0` (invalid) <br> 3. `< 0` (invalid)                                     |
-| DB        | numărul total de pinuri (`m`) | 1. `0` (empty) <br> 2. `< perPage` <br> 3. exact multiplu de `perPage` <br> 4. non-multiplu de `perPage` |
+Pentru exemplul nostru:
 
+1. Descompune specificatia în unități: funcția GetPins() reprezintă o singură unitate.
+2. Identifică parametrii: search, page, perPage.
+3. Găsește categorii:
+<br>
+- search: orice valoare validă (null, "", "text");
+<br>
+- page: dacă este în intervalul valid 1...n;
+<br>
+- perPage: dacă este validă, adică >= 1;
 
-#### Constrângeri:
-- dacă ```m = 0```, pagina trebuie să fie 1, ```search``` poate fi orice;
-- dacă ```perPage <= 0```, rezultatul este listă goală indiferent de ```page```;
-- dacă ```page > ceil(m/perPage)```, se returnează lista goală;
-- daca ```pag <= 0```, se returnează lista goală;
+4. Partiționeaza fiecare categorie în alternative:
+<br>
+- page: < 0, 0, 1, 2..n-1, n, n+1, > n+1;
+<br>
+- perPage: < 0, 0, 1, > 1;
 
-#### Testele:
+5. Scrie specificația de testare
+<br>
+- search:
+<br>
+  1) search = null || "" || "text" [ok]
+<br>
+- page: 
+<br>
+  1) {page | page < 0}
+  <br>
+  2) 0
+  <br>
+  3) 1  [if ok and minim_valid]
+  <br>
+  4) 2...n-1 [if ok and pagină_intermediară]
+  <br>
+  5) n  [if ok and maxim_valid]
+  <br>
+  6) n+1
+  <br>
+  7) {page | page > n+1}
+<br>
+- perPage: 
+<br>
+  1) {perPage | perPage < 0}
+  <br>
+  2) 0
+  <br>
+  3) 1 [if ok and minim_valid]
+  <br>
+  4) {perPage | perPage > 1} [if ok and valid_extins]
 
-| Nr.  | `search`     | `page` | `perPage` | `m` | Așteptare            |
-|------|--------------|--------|-----------|-----|-----------------------|
-| T1   | `""`         | 1      | 2         | 0   | pagină goală          |
-| T2   | `""`         | 1      | 2         | 5   | 2 elemente            |
-| T3   | `""`         | 3      | 2         | 5   | 1 element             |
-| T4   | `""`         | 4      | 2         | 5   | listă goală           |
-| T5   | `""`         | 0      | 2         | 5   | invalid, listă goală  |
-| T6   | `""`         | 1      | 0         | 5   | invalid, listă goală  |
-| T7   | `""`         | 1      | -2        | 5   | invalid, listă goală  |
-| T8   | `"test"`     | 1      | 2         | 4   | rezultate filtrate    |
-| T9   | `"noresult"` | 1      | 2         | 0   | listă goală           |
+Din specificația de testare ar trebui să rezulte 1 x 7 x 4 = 28 de cazuri de testare. Pe de altă
+parte, unele combinații de alternative nu au sens și pot fi eliminate. Acest lucru se poate face
+adăugând constrângeri acestor alternative. Constrângerile pot fi sau proprietăți ale alternativelor sau condiții de selectie bazate pe aceste proprietăți.  În acest caz, alternativele vor fi combinate doar dacă condițiile de selecție sunt satisfacute. 
+
+Aplicând aceste constrângeri și eliminând combinațiile invalide sau redundante, numărul cazurilor de testare se reduce la aproximativ 12 cazuri reprezentative.
+
+6. Creează cazuri de testare
+
+s1p1      s1p2      s1pp1     s1pp2 
+s1p3pp3   s1p3pp4   s1p4pp3   s1p4pp4 
+s1p5pp3   s1p5pp4   s1p6      s1p7
+
+7. Creează date de test
+
+| ID         | search      | page | perPage | Rezultat așteptat (expected)            |
+|------------|-------------|------|---------|-----------------------------------------|
+| s1p1       | "test"      | -1   | 1       | listă goală + LastPage = 0 + URL        |
+| s1p2       | null        | 0    | 2       | listă goală + LastPage = 0 + URL        |
+| s1pp1      | "test"      | 1    | -1      | listă goală + LastPage = 0 + URL        |
+| s1pp2      | ""          | 1    | 0       | listă goală + LastPage = 0 + URL        |
+| s1p3pp3    | null        | 1    | 1       | pin-uri paginate + LastPage = 10 + URL  |
+| s1p3pp4    | "abc"       | 1    | 2       | pin-uri paginate + LastPage = 10 + URL  |
+| s1p4pp3    | "search"    | 3    | 1       | pin-uri paginate + LastPage = 10 + URL  |
+| s1p4pp4    | null        | 3    | 3       | pin-uri paginate + LastPage = 10 + URL  |
+| s1p5pp3    | "x"         | 10   | 1       | pin-uri paginate + LastPage = 10 + URL  |
+| s1p5pp4    | "test"      | 10   | 2       | listă goală + LastPage = 0 + URL        |
+| s1p6       | "query"     | 11   | 2       | listă goală + LastPage = 0 + URL        |
+| s1p7       | "pin"       | 13   | 2       | listă goală + LastPage = 0 + URL        |
 
 
 ### 2. Testare structurală
@@ -244,8 +383,9 @@ public (IEnumerable<Pin> Pins, int LastPage, string PaginationUrl) GetPins(strin
         : _repo.GetPinsBySearch(search);
 
     int totalItems = pins.Count();
+    int lastPage = (int)Math.Ceiling((float)totalItems / perPage);
 
-    if (perPage <= 0 || page <= 0)
+    if (perPage <= 0 || page <= 0 || page > lastPage)
     {
         return (new List<Pin>(), 0, string.IsNullOrWhiteSpace(search)
             ? "/Pins/Index/?page"
@@ -255,7 +395,6 @@ public (IEnumerable<Pin> Pins, int LastPage, string PaginationUrl) GetPins(strin
     int offset = (page - 1) * perPage;
 
     var paginatedPins = pins.Skip(offset).Take(perPage).ToList();
-    int lastPage = (int)Math.Ceiling((float)totalItems / perPage);
     string url = string.IsNullOrWhiteSpace(search)
         ? "/Pins/Index/?page"
         : $"/Pins/Index/?search={search}&page";
@@ -268,19 +407,18 @@ public (IEnumerable<Pin> Pins, int LastPage, string PaginationUrl) GetPins(strin
 
 ### Instrucțiuni cheie:
 
-- **0**: `start`
 - **1**: `if (string.IsNullOrWhiteSpace(search))`
 - **2**: `GetAllPinsOrderedByLikes`
 - **3**: `GetPinsBySearch`
 - **4**: `totalItems = pins.Count`
-- **5**: `if (perPage <= 0 || page <= 0)`
-- **6**: `return early (empty list, page = 0)`
-- **7**: `offset = (page - 1) * perPage`
-- **8**: `paginatedPins = Skip + Take`
-- **9**: `lastPage = ceiling(totalItems / perPage)`
-- **10**: `if (string.IsNullOrWhiteSpace(search))`
-- **11**: `return final tuple`
-- **12**: `end`
+- **5**: `lastPage = (int)Math.Ceiling((float)totalItems / perPage);`
+- **6**: `if (perPage <= 0 || page <= 0  || page > lastPage)`
+- **7**: `if (string.IsNullOrWhiteSpace(search))`
+- **8**: `return early (empty list, page = 0, search)`
+- **9**: `offset = (page - 1) * perPage`
+- **10**: `paginatedPins = Skip + Take`
+- **11**: `if (string.IsNullOrWhiteSpace(search))`
+- **12**: `return (paginatedPins, lastPage, url)`
 
 ### a) Acoperire la nivel de instrucțiune (Statement coverage)
 
@@ -321,23 +459,6 @@ Fiecare condiție și decizie acoperită:
 - TC4: ```perPage = 0``` -> false
 - TC5: ```search = ""``` (string goală) -> true
 
-### e) Acoperirea la nivel de condiții multiple (Multiple Condition Coverage)
-
-Pentru ```if (perPage <= 0 || page <= 0)```:
-| perPage | page | Rezultat |
-|---------|------|----------|
-| 0       | 1    | TRUE     |
-| 1       | 0    | TRUE     |
-| 1       | 1    | FALSE    |
-
-### f) Modified Condition/Decision Coverage - MC/DC
-
-- ```perPage = 0```, ```page = 1``` → afectează decizia
-- ```perPage = 1```, ```page = 0``` → afectează decizia
-- ```perPage = 1```, ```page = 1``` → niciuna nu declanșează decizia → false
-
-Similar pentru ```string.IsNullOrWhiteSpace(search)```.
-
 ### g) Testarea circuitelor independente + Complexitate ciclomatică (McCabe)
 
 Formulă: V(G) = E - N + 2
@@ -351,16 +472,6 @@ Avem 3 circuite independente:
 - ```page``` invalid;
 - ```search``` valid + paginare validă;
 
-
-### h) Acoperire pe căi (Path Coverage)
-
-| Cale | Descriere                                               |
-|------|----------------------------------------------------------|
-| P1   | `perPage = 0` → return early                             |
-| P2   | `page = 0` → return early                                |
-| P3   | `search` valid → pins by search → paginare ok            |
-| P4   | `search = null` → pins by likes → paginare ok            |
-| P5   | `search = ""` → tratat ca null → pins by likes           |
 
 ## Raport despre folosirea unui tool AI (ChatGPT)
 
