@@ -179,22 +179,14 @@ Exista 3 intrări:
 - un întreg ```page```;
 - un întreg ```perPage```;
 - ```search``` poate să fie null, gol sau un text, toate fiind valide, deci nu determină clase de echivalență suplimentare;
-
-S_1 = { null, "", "text" }
-
+  - S_1 = { null, "", "text" }
 - ```page``` trebuie să fie >= 1 și <= n, deci se disting 3 clase de echivalență:
-
-P_1 = 1...n
-<br>
-P_2 = {page | page < 1}
-<br>
-P_3 = {page | page > n}
-
+  - P_1 = 1...n
+  - P_2 = {page | page < 1}
+  - P_3 = {page | page > n}
 - ```perPage``` trebuie să fie >= 1, deci se disting 2 clase de echivalență:
-
-PP_1 = {perPage | perPage < 1}
-<br>
-PP_2 = {perPage | perPage >= 1}
+  - PP_1 = {perPage | perPage < 1}
+  - PP_2 = {perPage | perPage >= 1}
 
 ### Domeniul de ieșiri:
 
@@ -208,34 +200,35 @@ Constă în următoarele răspunsuri:
 - dacă page (< 1 sau > n) sau perPage (< 1) este invalid, funcția returnează o listă goală, LastPage egal cu 0 și un URL de paginare;
 
 Acestea sunt folosite pentru a împărți domeniul de intrare în 2 clase: una pentru cazul în care page și perPage sunt >= 1 și page <= n și una pentru cazul în care page sau perPage este invalid (< 1 sau page > n):
-<br>
+
 C_1(page, perPage) = {l, lp, url | page >= 1 și perPage >= 1 și page <= n};
-<br>
+
 C_2(page, perPage) = {[], 0, url | page < 1 sau perPage < 1 sau page > n};
 
 Clasele de echivalență pentru întregul program (globale) se pot obține ca o combinatie a claselor individuale:
-<br>
+
 C_111 = {(search, page, perPage) | search ∈ S_1, page ∈ P_1, perPage ∈ PP_1}
-<br>
+
 C_112 = {(search, page, perPage) | search ∈ S_1, page ∈ P_1, perPage ∈ PP_2}
-<br>
+
 C_121 = {(search, page, perPage) | search ∈ S_1, page ∈ P_2, perPage ∈ PP_1}
-<br>
+
 C_122 = {(search, page, perPage) | search ∈ S_1, page ∈ P_2, perPage ∈ PP_2}
-<br>
+
 C_132 = {(search, page, perPage) | search ∈ S_1, page ∈ P_3, perPage ∈ PP_2}
 
 Setul de date de test se alcătuiește alegându-se o valoare a intrărilor pentru fiecare clasă de echivalență. De exemplu, pentru m = 10 și n = ceil(m / perPage):
-<br>
+
 c_111 = ("example", 2, -1)
-<br>
+
 c_112 = ("example", 3, 2)
-<br>
+
 c_121 = (null, 2, 0)
-<br>
+
 c_122 = ("", 0, 2)
-<br>
+
 c_132 = ("", 6, 3)
+
 5 clase
 
 | search     | page | perPage | Rezultat așteptat (expected)                    |
@@ -255,27 +248,21 @@ Odată ce au fost identificate clasele, valorile de frontieră sunt ușor de ide
 - valorile 0, 1 pentru ```perPage```;
 
 Deci se vor testa următoarele valori:
-<br>
 - P_1: 1, n
-<br>
 - P_2: 0
-<br>
 - P_3: n + 1
-<br>
 - PP_1: 0
-<br>
 - PP_2: 1
-<br> 
 - Pentru S_1 se ia câte o valoare arbitrară
 
 C_111 = ("example", 1, 0)
-<br>
+
 C_112 = ("example", 1, 1) ("example", 10, 1)
-<br>
+
 C_121 = (null, 1, 0)
-<br>
+
 C_122 = ("", 0, 1)
-<br>
+
 C_132 = ("", 11, 1)
 
 | search     | page | perPage | Rezultat așteptat (expected)                                           |
