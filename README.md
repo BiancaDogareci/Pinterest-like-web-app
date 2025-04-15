@@ -34,7 +34,7 @@ Proiectul are ca scop testarea unitară a serviciilor backend dezvoltate în cad
 Pentru implementarea și testarea proiectului, au fost utilizate tehnologii precum C#, ASP.NET Core pentru backend, xUnit ca framework de testare și Moq pentru simularea dependențelor.
 
 
-## Alegerea framework-ului de testare C# - XUnit
+## Alegerea framework-ului de testare C# - XUnit [[1]](#referințe)
 
 Pentru testarea aplicației noastre, am ales framework-ul xUnit deoarece oferă o serie de avantaje adaptate proiectelor moderne dezvoltate în ASP.NET versiunea 6+.
 
@@ -133,7 +133,7 @@ Pentru testarea aplicației noastre, am ales framework-ul xUnit deoarece oferă 
 ```
 
 
-## Configurarea și rularea testelor unitare
+## Configurarea și rularea testelor unitare [[3]](#referințe)
 ### 1. Rularea testelor din terminal cu "dotnet test"
 - Deschide terminalul în folderul soluție.
 - Rulează comanda:
@@ -156,9 +156,11 @@ dotnet test
 
 https://github.com/user-attachments/assets/d7559d29-8864-4700-b563-0feb710ec193
 
+
+
 ## Strategii de testare - Teorie + Exemple
 
-### 1. Testare funcțională
+### 1. Testare funcțională [[4]](#referințe)
 
 ### Exemplu:
 
@@ -334,7 +336,7 @@ s1p1&nbsp;&nbsp;&nbsp;&nbsp;s1p2&nbsp;&nbsp;&nbsp;&nbsp;s1pp1&nbsp;&nbsp;&nbsp;&
 | s1p7       | "pin"       | 13   | 2       | listă goală + LastPage = 0 + URL        |
 
 
-### 2. Testare structurală
+### 2. Testare structurală [[5]](#referințe)
 
 ### Graful de flux de control (Control Flow Graph - CFG)
 
@@ -395,8 +397,9 @@ instrucțiuni care sunt controlate de condiții (acestea corespund ramificațiil
 
 
 ### b) Acoperire la nivel de decizie (Decision coverange)
-- Este o extindere naturală a metodei precedente.
-- Genereaza date de test care testează cazurile când fiecare decizie este adevărată sau falsă.
+Este o extindere naturală a metodei precedente.
+
+Genereaza date de test care testează cazurile când fiecare decizie este adevărată sau falsă.
 
 |     | **Decizii**                                        |
 |-----|----------------------------------------------------|
@@ -414,7 +417,7 @@ instrucțiuni care sunt controlate de condiții (acestea corespund ramificațiil
 
 
 ### c) Acoperire pe condiții (Condition coverage)
-- Genereaza date de test astfel încat fiecare condiție individuală dintr-o decizie să ia atât valoarea adevărat cât și valoarea fals (dacă acest lucru este posibil).
+Genereaza date de test astfel încat fiecare condiție individuală dintr-o decizie să ia atât valoarea adevărat cât și valoarea fals (dacă acest lucru este posibil).
 
 |     | **Decizii**                                         | **Condiții individuale**                           |
 |-----|-----------------------------------------------------|----------------------------------------------------|
@@ -436,9 +439,11 @@ instrucțiuni care sunt controlate de condiții (acestea corespund ramificațiil
 
 
 ### d) Testarea circuitelor independente + Complexitate ciclomatică (McCabe)
-- Acesta este o modalitate de a identifica limita superioară pentru numărul de căi necesare pentru obținerea unei acoperiri la nivel de ramură.
-- Se bazează pe formula lui McCabe pentru Complexitate Ciclomatică. Dat fiind un graf complet conectat G cu e arce și n noduri, atunci numărul de circuite linear independente este dat de: V(G) = E – N + 1.
-- Formula simplificată: V(G) = E − N + 2.
+Acesta este o modalitate de a identifica limita superioară pentru numărul de căi necesare pentru obținerea unei acoperiri la nivel de ramură.
+
+Se bazează pe formula lui McCabe pentru Complexitate Ciclomatică. Dat fiind un graf complet conectat G cu e arce și n noduri, atunci numărul de circuite linear independente este dat de: V(G) = E – N + 1.
+
+Formula simplificată: V(G) = E − N + 2.
 
 - Noduri: 11;
 - Muchii: 11;
@@ -451,9 +456,46 @@ a) 1, 2, 4, 5, 6, 7, 8 (Aceasta este ramura pentru ```search == null``` sau ```s
 
 b) 1, 3, 4, 5, 6, 9, 10, 11, 12 (Aceasta este ramura pentru ```search != null``` și ```search != ""``` și continuarea execuției complete, cu paginare);
 
+
+
+## Mutation testing
+
+Mutation testing este o tehnică de testare care evaluează calitatea unui set de teste prin introducerea a unor mici modificări (numite mutanți) în codul sursă, apoi verificând dacă testele detectează acele modificări.
+
+Am ales **Stryker.NET**[[6]](#referințe) pentru că e cel mai potrivit framework de mutation testing în C# și funcționează bine cu proiecte ASP.NET. Acesta ne ajută să evaluăm cât de eficient acoperă testele unitare codul aplicației noastre și pentru a identifica eventualele puncte slabe din testare. În plus, **Stryker.NET** se integrează ușor cu testele scrise în **xUnit**. 
+
+Prin utilizarea sa, am putut măsura nu doar dacă codul este acoperit de teste, ci și cât de relevante sunt aceste teste, având un indicator concret al calității testării noastre.
+
+### Configurarea și rularea testelor cu mutanți[[7]](#referințe)
+
+Instalare globală
+```
+dotnet tool install -g dotnet-stryker
+```
+
+Running Stryker
+```
+cd ...Pinterest.Tests
+dotnet stryker
+```
+
+![Stryker.NET run in terminal](assets/stryker_ss1.png)
+
+Deschiderea Stryker.NET Report
+
+```
+open ./StrykerOutput/2025-04-15.14-45-35/reports/mutation-report.html
+```
+
+![Stryker.NET Report](assets/stryker_report_ss2.png)
+
+
 ## Raport despre folosirea unui tool AI (ChatGPT)
 
-## Referințe:
+
+
+
+## Referințe
 
 [1] Robert Dennyson, [Choosing the Right Testing Framework for .NET Applications](https://medium.com/@robertdennyson/xunit-vs-nunit-vs-mstest-choosing-the-right-testing-framework-for-net-applications-b6b9b750bec6), Data ultimei accesări: 6 aprilie 2025
 
@@ -464,5 +506,9 @@ b) 1, 3, 4, 5, 6, 9, 10, 11, 12 (Aceasta este ramura pentru ```search != null```
 [4] [Understanding Functional Testing](https://www.opentext.com/what-is/functional-testing)
 
 [5] [Understanding The Basic Concept Of Structural Testing](https://unstop.com/blog/structural-testing)
+
+[6] [Stryker.NET Framework Documentation](https://stryker-mutator.io/docs/stryker-net/introduction/)
+
+[7] [Stryker.NET Framework Documentation](https://stryker-mutator.io/docs/stryker-net/getting-started/)
 
 

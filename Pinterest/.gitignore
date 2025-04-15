@@ -236,3 +236,5 @@ _Pvt_Extensions
 # Ignore bin and obj folders recursively
 **/[Bb]in/
 **/[Oo]bj/
+
+**/.DS_Store
