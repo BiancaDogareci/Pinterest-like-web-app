@@ -481,11 +481,8 @@ dotnet tool install -g dotnet-stryker
 
 Running Stryker
 ```
-cd ...Pinterest.Tests
 dotnet stryker
 ```
-
-![Stryker.NET run in terminal](assets/stryker_ss1.png)
 
 Deschiderea Stryker.NET Report
 
@@ -493,7 +490,8 @@ Deschiderea Stryker.NET Report
 open ./StrykerOutput/2025-04-15.14-45-35/reports/mutation-report.html
 ```
 
-![Stryker.NET Report](assets/stryker_report_ss2.png)
+https://github.com/user-attachments/assets/0dde9616-ea87-45f3-90f7-82d1618f4570
+
 
 
 ## Raport despre folosirea unui tool AI (ChatGPT)
