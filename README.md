@@ -445,16 +445,22 @@ Se bazează pe formula lui McCabe pentru Complexitate Ciclomatică. Dat fiind un
 
 Formula simplificată: V(G) = E − N + 2.
 
+Pentru a forma circuitele am adaugat 2 muchii (8, 1) și (12, 1).
+
 - Noduri: 11;
-- Muchii: 11;
+- Muchii: 11 + 2 = 13;
 
-V(G) = 11 - 11 + 2 = 2
+V(G) = 13 - 11 + 2 = 4
 
-Avem 2 circuite independente:
+Avem 4 circuite independente:
 
-a) 1, 2, 4, 5, 6, 7, 8 (Aceasta este ramura pentru ```search == null``` sau ```search == ""``` și returnare devreme);
+a) 1, 2, 4, 5, 6, 7, 8, 1
 
-b) 1, 3, 4, 5, 6, 9, 10, 11, 12 (Aceasta este ramura pentru ```search != null``` și ```search != ""``` și continuarea execuției complete, cu paginare);
+b) 1, 3, 4, 5, 6, 7, 8, 1
+
+c) 1, 2, 4, 5, 6, 9, 10, 11, 12, 1
+
+d) 1, 3, 4, 5, 6, 9, 10, 11, 12, 1
 
 
 
