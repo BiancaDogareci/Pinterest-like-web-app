@@ -493,10 +493,35 @@ open ./StrykerOutput/2025-04-15.14-45-35/reports/mutation-report.html
 https://github.com/user-attachments/assets/0dde9616-ea87-45f3-90f7-82d1618f4570
 
 
+### Exemple rezolvare mutanti
 
-## Raport despre folosirea unui tool AI (ChatGPT)
+### 1.
+Mutantul în care se schimbă mesajul aruncat de excepție este survived pentru că toate unit testele definite pentru funcția ```SavePinToCategory()``` verifică dacă s-a aruncat excepția, dar nu și mesajul excepției.
+
+![1](assets/survived_mutant.png)
+
+Pentru a îl face killed, am adăugat într-un test în care se intra pe condiția ```if (category == null)``` verificarea mesajului de eroare.
+
+![1](assets/solve_mutant.png)
+
+![1](assets/killed_mutant.png)
 
 
+### 2.
+
+Mutantul testează dacă aplicația funcționează corect atunci când nu se creează explicit directorul în care trebuie salvat fișierul (în cazul în care nu exista deja). Testele inițiale nu dau eroare fără ```CreateDirectory(...)```, pentru că se cere mereu salvarea fișierulu în "wwwrooot", folder care există deja în proiect și nu trebuie creat, astfel mutantul e survived.
+
+![2](assets/survived_mutant_2.png)
+
+Pentru a îl face killed, am adăugat un test care:
+- creează un folder temporar care nu există (env);
+- funcția CreatePinAsync încearcă să salveze un fișier acolo;
+
+Mutantul devine killed pentru că se încearcă salvarea fișierului într-un folder care nu există (env).
+
+![2](assets/solve_mutant_2.png)
+
+![2](assets/killed_mutant_2.png)
 
 
 ## Referințe
