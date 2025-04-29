@@ -911,6 +911,31 @@ namespace Pinterest.Tests
             return mock.Object;
         }
 
+        // Test adaugat pentru rezolvarea unui mutant
+        [Fact]
+        public async Task CreatePinAsync_ShouldFail_WhenDirectoryDoesNotExistAndIsNotCreated()
+        {
+            var repoMock = new Mock<PinRepository>(null);
+            var service = new PinService(repoMock.Object);
+
+            var user = new AppUser { Id = "user1" };
+
+            // Creeaza un path nou gol
+            var env = Mock.Of<IWebHostEnvironment>(e => e.WebRootPath == Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
+
+            var file = CreateMockFile("x.jpg", "image/jpeg");
+
+            var pin = new Pin
+            {
+                Title = "Title",
+                Description = "Description"
+            };
+
+            var result = await service.CreatePinAsync(pin, file, user, env);
+
+            Assert.True(result.IsValid);
+        }
+
         [Fact]
         public async Task CreatePinAsync_TitleNull_t1()
         {

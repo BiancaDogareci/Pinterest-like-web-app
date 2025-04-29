@@ -176,7 +176,8 @@ public class CategoryServiceTests
 
         var service = new CategoryService(repoMock.Object, pinRepoMock.Object);
 
-        Assert.Throws<InvalidOperationException>(() => service.SavePinToCategory(1, 10));
+        var ex = Assert.Throws<InvalidOperationException>(() => service.SavePinToCategory(1, 10));
+        Assert.Equal("Category does not exist.", ex.Message);
     }
 
     [Fact]
